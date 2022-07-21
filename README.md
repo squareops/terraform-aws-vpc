@@ -1,3 +1,11 @@
+## IAM permission Required to run this module
+
+- AmazonVPCFullAccess
+- CloudWatchFullAccess
+- AmazonSSMFullAccess
+- AmazonEC2FullAccess
+- IAMFullAccess
+
 # AWS Network Terraform module
 
 Terraform module which creates Network resources on AWS.
