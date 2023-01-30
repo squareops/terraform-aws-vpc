@@ -10,11 +10,10 @@ locals {
   vpc_cidr = "172.10.0.0/16"
 }
 
-data "aws_region" "current" {}
 data "aws_availability_zones" "available" {}
 
 module "vpc" {
-  source = "squareops/terraform-aws-network"
+  source = "squareops/vpc/aws"
 
   environment           = local.environment
   name                  = local.name
