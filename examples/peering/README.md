@@ -28,7 +28,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_vpc_peering"></a> [vpc\_peering](#module\_vpc\_peering) | squareops/vpc/aws//modules/vpc-peering | n/a |
+| <a name="module_vpc_peering"></a> [vpc\_peering](#module\_vpc\_peering) | squareops/vpc/aws//modules/vpc_peering | n/a |
 
 ## Resources
 
