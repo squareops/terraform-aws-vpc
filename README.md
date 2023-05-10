@@ -4,6 +4,8 @@
 
 [squareops_avatar]: https://squareops.com/wp-content/uploads/2022/12/squareops-logo.png
 
+[RDS_avatar]: https://logo-rds.s3.amazonaws.com/advance-tier-with-rds+(1).png
+
 ### [SquareOps Technologies](https://squareops.com/) Your DevOps Partner for Accelerating cloud journey.
 
 <br>
