@@ -10,8 +10,6 @@ locals {
   vpc_cidr = "10.10.0.0/16"
 }
 
-data "aws_availability_zones" "available" {}
-
 module "vpc" {
   source                 = "squareops/vpc/aws"
   name                   = local.name

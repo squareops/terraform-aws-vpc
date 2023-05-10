@@ -7,8 +7,6 @@ locals {
   }
 }
 
-data "aws_availability_zones" "available" {}
-
 module "vpc_accepter" {
   source                = "squareops/vpc/aws"
   name                  = "accepter"
