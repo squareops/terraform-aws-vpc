@@ -1,7 +1,7 @@
 # AWS Network Terraform module
 
 <p align="left">
-  <img src="https://test-rds-image.s3.amazonaws.com/squareops.jpg" width="600" height="80" />
+  <img src="https://test-rds-image.s3.amazonaws.com/Studio_Project(1)(1).jpeg" width="600" height="80" />
 
 </p>
 
