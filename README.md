@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://squareops.com/wp-content/uploads/2022/12/squareops-logo.png" width="400" />
-  <img src="https://test-rds-image.s3.amazonaws.com/badge+(1).png" width="400" height="200" /> 
+  <img src="https://test-rds-image.s3.amazonaws.com/badge+(1).png" width="400" height="100" /> 
 </p>
 
 
