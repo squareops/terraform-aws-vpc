@@ -1,16 +1,8 @@
 # AWS Network Terraform module
 
-![squareops_avatar]
-
-[squareops_avatar]: https://squareops.com/wp-content/uploads/2022/12/squareops-logo.png 
-
-![badge (1).png]
-
-[badge (1).png]: https://test-rds-image.s3.amazonaws.com/badge+(1).png
-
 <p align="center">
   <img src="https://squareops.com/wp-content/uploads/2022/12/squareops-logo.png" width="400" />
-  <img src="https://test-rds-image.s3.amazonaws.com/badge+(1).png" width="400" /> 
+  <img src="https://test-rds-image.s3.amazonaws.com/badge+(1).png" width="400" height="200" /> 
 </p>
 
 
