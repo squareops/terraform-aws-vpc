@@ -2,11 +2,15 @@
 
 ![squareops_avatar]
 
-[squareops_avatar]: https://squareops.com/wp-content/uploads/2022/12/squareops-logo.png [advance-tier-with-rds (1).png]: https://test-rds-image.s3.amazonaws.com/advance-tier-with-rds+(1).png
+[squareops_avatar]: https://squareops.com/wp-content/uploads/2022/12/squareops-logo.png 
 
 ![advance-tier-with-rds (1).png]
 
 [advance-tier-with-rds (1).png]: https://test-rds-image.s3.amazonaws.com/advance-tier-with-rds+(1).png
+
+![badge (1).png]
+
+[badge (1).png]: https://test-rds-image.s3.amazonaws.com/badge+(1).png
 
 ### [SquareOps Technologies](https://squareops.com/) Your DevOps Partner for Accelerating cloud journey.
 
