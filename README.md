@@ -1,8 +1,8 @@
 # AWS Network Terraform module
 
 <p align="left">
-  <img src="https://squareops.com/wp-content/uploads/2022/12/squareops-logo.png" width="400" height="80" />
-  <img src="https://test-rds-image.s3.amazonaws.com/badge+(1).png" width="300" height="80" /> 
+  <img src="https://test-rds-image.s3.amazonaws.com/squareops.jpg" width="600" height="80" />
+
 </p>
 
 ### [SquareOps Technologies](https://squareops.com/) Your DevOps Partner for Accelerating cloud journey.
