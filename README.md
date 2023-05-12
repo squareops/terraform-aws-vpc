@@ -109,7 +109,11 @@ In this module, we have implemented the following CIS Compliance checks for VPC:
 | Benchmark | Description | Status |
 |-----------|-------------|--------|
 | Ensure no security groups allow ingress from 0.0.0.0/0 or ::/0 to port 3389 | No Security Groups open to 0.0.0.0/0 | &#x2714; |
-| Ensure the default security group of every VPC restricts all traffic | No Default Security Groups open to 0.0.0.0/0 | &#x2714; |
+| Ensure no Network ACLs allow ingress from 0.0.0.0/0 to remote server administration ports | For all VPCs created using this module | &#x2714; |
+| Ensure the default security group of every VPC restricts all traffic | For all VPCs created using this module | &#x2714; |
+| Ensure VPC flow logging is enabled in all VPCs | No Default Security Groups open to 0.0.0.0/0 | &#x2714; |
+| Ensure IAM instance roles are used for AWS resource access from instances |For VPN server created using this module | &#x2713; |
+| Ensure EBS volume encryption is enabled   | For VPN server created using this module | &#x2713; |
 
 
 
