@@ -18,7 +18,7 @@ module "key_pair_vpn" {
 }
 
 module "vpc" {
-  source                                          = "squareops/vpc/aws"
+  source                                          = "../../"
   name                                            = local.name
   vpc_cidr                                        = local.vpc_cidr
   environment                                     = local.environment
