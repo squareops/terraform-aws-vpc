@@ -31,7 +31,7 @@ module "vpc" {
   availability_zones                              = 2
   vpn_server_enabled                              = false
   intra_subnet_enabled                            = true
-  auto_assign_public_ip                         = true
+  auto_assign_public_ip                           = true
   public_subnet_enabled                           = true
   private_subnet_enabled                          = true
   one_nat_gateway_per_az                          = true
