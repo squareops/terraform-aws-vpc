@@ -18,7 +18,7 @@ module "key_pair_vpn" {
 }
 
 module "vpc" {
-  source                                          = "squareops/vpc/aws"
+  source                                          = "../../"
   name                                            = local.name
   vpc_cidr                                        = local.vpc_cidr
   environment                                     = local.environment
@@ -28,9 +28,9 @@ module "vpc" {
   vpn_server_enabled                              = false
   intra_subnet_enabled                            = true
   public_subnet_enabled                           = true
+  auto_assign_public_ip                           = true
   private_subnet_enabled                          = true
   one_nat_gateway_per_az                          = true
-  map_public_ip_on_launch                         = true
   database_subnet_enabled                         = true
   vpn_server_instance_type                        = "t3a.small"
   flow_log_max_aggregation_interval               = 60
