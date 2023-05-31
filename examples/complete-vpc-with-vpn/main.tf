@@ -30,6 +30,7 @@ module "vpc" {
   public_subnet_enabled                           = true
   private_subnet_enabled                          = true
   one_nat_gateway_per_az                          = true
+  map_public_ip_on_launch                         = true
   database_subnet_enabled                         = true
   vpn_server_instance_type                        = "t3a.small"
   flow_log_max_aggregation_interval               = 60
