@@ -7,7 +7,7 @@
 ### [SquareOps Technologies](https://squareops.com/) Your DevOps Partner for Accelerating cloud journey.
 
 <br>
-Terraform module to create Networking resources for workload deployment on AWS Cloud.
+Terraform module to create Networking resources with IPv4 or dual stack IP mode enabled for workload deployment on AWS Cloud.
 
 ## Usage Example
 
@@ -26,6 +26,7 @@ module "vpc" {
   name                                            = "skaf"
   vpc_cidr                                        = "10.0.0.0/16"
   environment                                     = "production"
+  ipv6_enabled                                    = true
   flow_log_enabled                                = true
   vpn_key_pair_name                               = module.key_pair_vpn.key_pair_name
   availability_zones                              = 2
