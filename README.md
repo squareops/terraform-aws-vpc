@@ -82,6 +82,7 @@ This module supports three scenarios to create Network resource on AWS. Each wil
 
 **vpc-with-ipv6:** To create VPC with IPv6 just you have to enable the parameter ipv6_enabled. Rest all the things will be taken care by module. Example is at below how to use it.
 
+```hcl
 module "vpc" {
   source                                          = "squareops/vpc/aws"
   name                                            = local.name
@@ -99,7 +100,7 @@ module "vpc" {
   database_subnet_assign_ipv6_address_on_creation = true
   intra_subnet_assign_ipv6_address_on_creation    = true
 }
-
+```
 
 # IAM Permissions
 The required IAM permissions to create resources from this module can be found [here](https://github.com/squareops/terraform-aws-vpc/blob/main/IAM.md)
