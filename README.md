@@ -80,6 +80,27 @@ This module supports three scenarios to create Network resource on AWS. Each wil
 
 - **vpc-peering:** VPC peering support is available using submodule `vpc_peering`. Refer [Peering Docs](https://github.com/squareops/terraform-aws-vpc/tree/main/modules/vpc_peering) for more information
 
+**vpc-with-ipv6:** To create VPC with IPv6 just you have to enable the parameter ipv6_enabled. Rest all the things will be taken care by module. Example is at below how to use it.
+
+module "vpc" {
+  source                                          = "squareops/vpc/aws"
+  name                                            = local.name
+  vpc_cidr                                        = local.vpc_cidr
+  environment                                     = local.environment
+  availability_zones                              = 2
+  public_subnet_enabled                           = true
+  private_subnet_enabled                          = true
+  intra_subnet_enabled                            = false
+  database_subnet_enabled                         = false
+  auto_assign_public_ip                           = true
+  ipv6_enabled                                    = local.ipv6_enabled
+  public_subnet_assign_ipv6_address_on_creation   = true
+  private_subnet_assign_ipv6_address_on_creation  = true
+  database_subnet_assign_ipv6_address_on_creation = true
+  intra_subnet_assign_ipv6_address_on_creation    = true
+}
+
+
 # IAM Permissions
 The required IAM permissions to create resources from this module can be found [here](https://github.com/squareops/terraform-aws-vpc/blob/main/IAM.md)
 
@@ -112,8 +133,8 @@ In this module, we have implemented the following CIS Compliance checks for VPC:
 | Ensure no Network ACLs allow ingress from 0.0.0.0/0 to remote server administration ports | For all VPCs created using this module | &#x2714; |
 | Ensure the default security group of every VPC restricts all traffic | For all VPCs created using this module | &#x2714; |
 | Ensure VPC flow logging is enabled in all VPCs | No Default Security Groups open to 0.0.0.0/0 | &#x2714; |
-| Ensure IAM instance roles are used for AWS resource access from instances |For VPN server created using this module | &#x2713; |
-| Ensure EBS volume encryption is enabled   | For VPN server created using this module | &#x2713; |
+| Ensure IAM instance roles are used for AWS resource access from instances |For VPN server created using this module | &#x2714; |
+| Ensure EBS volume encryption is enabled   | For VPN server created using this module | &#x2714; |
 
 
 
