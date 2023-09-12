@@ -12,7 +12,7 @@ locals {
 }
 
 module "vpc_ipam" {
-  source = "../.."
+  source = "squareops/vpc/aws"
 
   name = local.name
 
