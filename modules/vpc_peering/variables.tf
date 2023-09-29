@@ -39,3 +39,21 @@ variable "peering_enabled" {
   description = "Set this variable to true if you want to create the VPC peering connection. Set it to false if you want to skip the creation process."
   default     = true
 }
+
+variable "multi_account_enabled" {
+  type        = bool
+  description = "Set this variable to true if you want to create the VPC peering connection between reagions. Set it to false if you want to skip the creation process."
+  default     = true
+}
+
+variable "requester_aws_profile" {
+  type        = string
+  description = "Provide the AWS profile where the requester VPC is located."
+  default     = ""
+}
+
+variable "accepter_aws_profile" {
+  type        = string
+  description = "Provide the AWS profile where the accepter VPC is located."
+  default     = ""
+}

@@ -12,11 +12,14 @@ locals {
 }
 
 module "vpc_peering" {
-  source               = "squareops/vpc/aws//modules/vpc_peering"
-  accepter_name        = local.accepter_name
-  accepter_vpc_id      = local.accepter_vpc_id
-  accepter_vpc_region  = local.accepter_region
-  requester_name       = local.requester_name
-  requester_vpc_id     = local.requester_vpc_id
-  requester_vpc_region = local.requester_region
+  source                = "squareops/vpc/aws//modules/vpc_peering"
+  accepter_name         = local.accepter_name
+  accepter_vpc_id       = local.accepter_vpc_id
+  accepter_vpc_region   = local.accepter_region
+  requester_name        = local.requester_name
+  requester_vpc_id      = local.requester_vpc_id
+  requester_vpc_region  = local.requester_region
+  multi_account_enabled = false
+  requester_aws_profile = ""
+  accepter_aws_profile  = ""
 }
