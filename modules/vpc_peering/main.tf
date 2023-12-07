@@ -4,13 +4,15 @@ locals {
 }
 
 provider "aws" {
-  alias  = "peer"
-  region = var.requester_vpc_region
+  alias   = "peer"
+  region  = var.requester_vpc_region
+  profile = var.multi_account_enabled ? var.requester_aws_profile : "default"
 }
 
 provider "aws" {
-  alias  = "accepter"
-  region = var.accepter_vpc_region
+  alias   = "accepter"
+  region  = var.accepter_vpc_region
+  profile = var.multi_account_enabled ? var.accepter_aws_profile : "default"
 }
 
 data "aws_vpc" "accepter" {
@@ -33,13 +35,18 @@ data "aws_route_tables" "requester" {
   provider = aws.peer
 }
 
+data "aws_caller_identity" "accepter" {
+  provider = aws.accepter
+}
+
 resource "aws_vpc_peering_connection" "this" {
-  count       = var.peering_enabled ? 1 : 0
-  vpc_id      = var.requester_vpc_id
-  peer_vpc_id = var.accepter_vpc_id
-  peer_region = var.accepter_vpc_region
-  auto_accept = false
-  provider    = aws.peer
+  count         = var.peering_enabled ? 1 : 0
+  vpc_id        = var.requester_vpc_id
+  peer_vpc_id   = var.accepter_vpc_id
+  peer_region   = var.multi_account_enabled ? var.accepter_vpc_region : null
+  auto_accept   = false
+  peer_owner_id = var.multi_account_enabled ? data.aws_caller_identity.accepter.id : null
+  provider      = aws.peer
   tags = {
     Name = format("%s-%s-%s", var.requester_name, "to", var.accepter_name)
   }
