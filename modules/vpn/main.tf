@@ -75,7 +75,7 @@ data "aws_ami" "ubuntu_20_ami" {
 }
 
 
-data "template_file" "pritunl" {
+data "templatefile" "pritunl" {
   template = file("${path.module}/scripts/pritunl-vpn.sh")
 }
 
