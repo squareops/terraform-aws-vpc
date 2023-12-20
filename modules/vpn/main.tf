@@ -87,7 +87,7 @@ module "vpn_server" {
   key_name                    = var.vpn_key_pair
   associate_public_ip_address = true
   vpc_security_group_ids      = [module.security_group_vpn.security_group_id]
-  user_data                   = templatefile("${path.module}/scripts/pritunl-vpn.sh")
+  user_data                   = templatefile("${path.module}/scripts/pritunl-vpn.sh", {})
   iam_instance_profile        = join("", aws_iam_instance_profile.vpn_SSM[*].name)
 
 
