@@ -1,316 +1,112 @@
 locals {
-  azs                   = length(var.vpc_availability_zones)
-  public_subnets_native = var.vpc_public_subnet_enabled ? length(var.vpc_public_subnet_cidrs) > 0 ? var.vpc_public_subnet_cidrs : [for netnum in range(0, local.azs) : cidrsubnet(var.vpc_cidr, 8, netnum)] : []
-  secondary_public_subnets = var.vpc_public_subnet_enabled && var.secondry_cidr_enabled ? [
-    for cidr_block in var.secondary_cidr_blocks : [
-      for netnum in range(0, local.azs) : cidrsubnet(cidr_block, 8, netnum)
-    ]
-  ] : []
-  vpc_public_subnets       = concat(local.public_subnets_native, flatten(local.secondary_public_subnets))
-  intra_subnets_native = var.vpc_intra_subnet_enabled ? length(var.vpc_intra_subnet_cidrs) > 0 ? var.vpc_intra_subnet_cidrs : [for netnum in range(local.azs * 3, local.azs * 4) : cidrsubnet(var.vpc_cidr, 8, netnum)] : []
-  secondary_intra_subnets = var.vpc_intra_subnet_enabled && var.secondry_cidr_enabled ? [
-    for cidr_block in var.secondary_cidr_blocks : [
-      for netnum in range(local.azs * 3, local.azs * 4) : cidrsubnet(cidr_block, 8, netnum)
-    ]
-  ] : []
-  vpc_intra_subnets          = concat(local.intra_subnets_native, flatten(local.secondary_intra_subnets))
-  private_subnets_native = var.vpc_private_subnet_enabled ? length(var.vpc_private_subnet_cidrs) > 0 ? var.vpc_private_subnet_cidrs : [for netnum in range(local.azs, local.azs * 2) : cidrsubnet(var.vpc_cidr, 4, netnum)] : []
-  secondary_private_subnets = var.vpc_private_subnet_enabled && var.secondry_cidr_enabled ? [
-    for cidr_block in var.secondary_cidr_blocks : [
-      for netnum in range(local.azs, local.azs * 2) : cidrsubnet(cidr_block, 4, netnum)
-    ]
-  ] : []
-  vpc_private_subnets         = concat(local.private_subnets_native, flatten(local.secondary_private_subnets))
-  database_subnets_native = var.database_subnet_enabled ? length(var.database_subnet_cidrs) > 0 ? var.database_subnet_cidrs : [for netnum in range(local.azs * 2, local.azs * 3) : cidrsubnet(var.vpc_cidr, 8, netnum)] : []
-  secondary_database_subnets = var.database_subnet_enabled && var.secondry_cidr_enabled ? [
-    for cidr_block in var.secondary_cidr_blocks : [
-      for netnum in range(local.azs * 2, local.azs * 3) : cidrsubnet(cidr_block, 8, netnum)
-    ]
-  ] : []
-  database_subnets                     = concat(local.database_subnets_native, flatten(local.secondary_database_subnets))
-  vpc_single_nat_gateway                   = var.vpc_one_nat_gateway_per_az == true ? false : true
-  create_database_subnet_route_table   = var.database_subnet_enabled
-  create_flow_log_cloudwatch_log_group = var.vpc_flow_log_enabled == true || var.vpc_flow_log_cloudwatch_log_group_skip_destroy == true ? true : false
-  is_supported_arch                    = data.aws_ec2_instance_type.arch.supported_architectures[0] == "arm64" ? false : true # for VPN Instance
-  nacl_allow_vpc_access_rule = [{
-    rule_no    = 97
-    action     = "allow"
-    from_port  = 0
-    to_port    = 0
-    protocol   = "-1"
-    cidr_block = var.vpc_cidr
+  vpc_name                                       = "vpc-test"
+  aws_region                                     = "us-east-1"
+  aws_account_id                                 = "767398031518"
+  environment                                    = "prod"
+  kms_user                                       = null
+  vpc_cidr                                       = "10.10.0.0/16"
+  vpc_availability_zones                         = ["us-east-1a", "us-east-1b"]
+  kms_deletion_window_in_days                    = 7
+  enable_key_rotation                            = false
+  is_enabled                                     = true
+  vpc_flow_log_enabled                           = true
+  vpn_server_enabled                             = true
+  vpc_intra_subnet_enabled                       = true
+  vpc_public_subnet_enabled                      = true
+  auto_assign_public_ip                          = true
+  vpc_private_subnet_enabled                     = true
+  vpc_one_nat_gateway_per_az                     = true
+  vpc_database_subnet_enabled                    = true
+  vpc_s3_endpoint_enabled                        = true
+  vpc_ecr_endpoint_enabled                       = true
+  vpn_server_instance_type                       = "t3a.small"
+  vpc_flow_log_cloudwatch_log_group_skip_destroy = false
+  current_identity                               = data.aws_caller_identity.current.arn
+  multi_region                                   = false
+  additional_aws_tags = {
+    Owner      = "Organization_Name"
+    Expires    = "Never"
+    Department = "Engineering"
+  }
+}
+
+data "aws_caller_identity" "current" {}
+
+module "key_pair_vpn" {
+  source             = "squareops/keypair/aws"
+  key_name           = format("%s-%s-vpn", local.environment, local.vpc_name)
+  environment        = local.environment
+  ssm_parameter_path = format("%s-%s-vpn", local.environment, local.vpc_name)
+}
+
+module "kms" {
+  source = "terraform-aws-modules/kms/aws"
+
+  deletion_window_in_days = local.kms_deletion_window_in_days
+  description             = "Symetric Key to Enable Encryption at rest using KMS services."
+  enable_key_rotation     = local.enable_key_rotation
+  is_enabled              = local.is_enabled
+  key_usage               = "ENCRYPT_DECRYPT"
+  multi_region            = local.multi_region
+
+  # Policy
+  enable_default_policy                  = true
+  key_owners                             = [local.current_identity]
+  key_administrators                     = local.kms_user == null ? ["arn:aws:iam::${local.aws_account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling", "arn:aws:iam::${local.aws_account_id}:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKS", local.current_identity] : local.kms_user
+  key_users                              = local.kms_user == null ? ["arn:aws:iam::${local.aws_account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling", "arn:aws:iam::${local.aws_account_id}:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKS", local.current_identity] : local.kms_user
+  key_service_users                      = local.kms_user == null ? ["arn:aws:iam::${local.aws_account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling", "arn:aws:iam::${local.aws_account_id}:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKS", local.current_identity] : local.kms_user
+  key_symmetric_encryption_users         = [local.current_identity]
+  key_hmac_users                         = [local.current_identity]
+  key_asymmetric_public_encryption_users = [local.current_identity]
+  key_asymmetric_sign_verify_users       = [local.current_identity]
+  key_statements = [
+    {
+      sid    = "AllowCloudWatchLogsEncryption",
+      effect = "Allow"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["logs.${local.aws_region}.amazonaws.com"]
+        }
+      ]
     }
-
   ]
-  enable_ipv6                                     = var.ipv6_enabled
-  ipv6_only                                       = var.ipv6_enabled && var.ipv6_only ? true : false
-  public_subnet_assign_ipv6_address_on_creation   = var.public_subnet_assign_ipv6_address_on_creation == true && var.ipv6_enabled == true ? true : false
-  private_subnet_assign_ipv6_address_on_creation  = var.private_subnet_assign_ipv6_address_on_creation == true && var.ipv6_enabled == true ? true : false
-  database_subnet_assign_ipv6_address_on_creation = var.database_subnet_assign_ipv6_address_on_creation == true && var.ipv6_enabled == true ? true : false
-  intra_subnet_assign_ipv6_address_on_creation    = var.intra_subnet_assign_ipv6_address_on_creation == true && var.ipv6_enabled == true ? true : false
+  # Aliases
+  aliases                 = ["${local.vpc_name}-KMS"]
+  aliases_use_name_prefix = true
+}
 
-  public_subnet_ipv6_prefixes   = var.vpc_public_subnet_enabled ? [for i in range(local.azs) : i] : []
-  private_subnet_ipv6_prefixes  = var.vpc_private_subnet_enabled ? [for i in range(local.azs) : i + length(data.aws_availability_zones.available.names)] : []
-  database_subnet_ipv6_prefixes = var.database_subnet_enabled ? [for i in range(local.azs) : i + 2 * length(data.aws_availability_zones.available.names)] : []
-  intra_subnet_ipv6_prefixes    = var.vpc_intra_subnet_enabled ? [for i in range(local.azs) : i + 3 * length(data.aws_availability_zones.available.names)] : []
-}
-data "aws_availability_zones" "available" {}
-data "aws_ec2_instance_type" "arch" {
-  instance_type = var.vpn_server_instance_type
-}
 
 module "vpc" {
-  source                                          = "terraform-aws-modules/vpc/aws"
-  version                                         = "5.2.0"
-  name                                            = format("%s-%s-vpc", var.environment, var.name)
-  cidr                                            = var.vpc_cidr # CIDR FOR VPC
-  azs                                             = [for n in range(0, local.azs) : data.aws_availability_zones.available.names[n]]
-  use_ipam_pool                                   = var.ipam_enabled ? true : false
-  ipv4_ipam_pool_id                               = var.ipam_enabled && var.create_ipam_pool ? aws_vpc_ipam_pool.ipam_pool[0].id : null
-  ipv4_netmask_length                             = var.ipam_enabled ? var.ipv4_netmask_length : null
-  create_database_subnet_group                    = length(local.database_subnets) > 1 && var.database_subnet_group_enabled ? true : false
-  intra_subnets                                   = local.vpc_intra_subnets
-  public_subnets                                  = local.vpc_public_subnets
-  private_subnets                                 = local.vpc_private_subnets
-  database_subnets                                = local.database_subnets
-  enable_flow_log                                 = var.vpc_flow_log_enabled
-  enable_nat_gateway                              = length(local.vpc_private_subnets) > 0 && !var.ipv6_only ? true : false
-  single_nat_gateway                              = local.vpc_single_nat_gateway
-  enable_vpn_gateway                              = var.vpn_gateway_enabled
-  enable_dns_hostnames                            = var.dns_hostnames_enabled
-  flow_log_traffic_type                           = var.vpc_flow_log_traffic_type
-  secondary_cidr_blocks                           = var.secondry_cidr_enabled ? var.secondary_cidr_blocks : []
-  one_nat_gateway_per_az                          = var.vpc_one_nat_gateway_per_az
-  map_public_ip_on_launch                         = var.auto_assign_public_ip
-  flow_log_destination_type                       = var.vpc_flow_log_destination_type
-  manage_default_network_acl                      = var.vpc_manage_default_network_acl
-  default_network_acl_ingress                     = concat(local.nacl_allow_vpc_access_rule, var.default_network_acl_ingress)
-  manage_default_security_group                   = var.manage_vpc_default_security_group
-  default_security_group_ingress                  = [] # Enforcing no rules being present in the default security group.
-  default_security_group_egress                   = []
-  create_database_nat_gateway_route               = var.create_database_nat_gateway_route
-  create_database_subnet_route_table              = local.create_database_subnet_route_table
-  create_flow_log_cloudwatch_iam_role             = var.vpc_flow_log_enabled
-  create_flow_log_cloudwatch_log_group            = local.create_flow_log_cloudwatch_log_group
-  flow_log_max_aggregation_interval               = var.vpc_flow_log_max_aggregation_interval
-  flow_log_cloudwatch_log_group_skip_destroy      = var.vpc_flow_log_cloudwatch_log_group_skip_destroy
-  flow_log_cloudwatch_log_group_retention_in_days = var.vpc_flow_log_cloudwatch_log_group_retention_in_days
-  flow_log_cloudwatch_log_group_kms_key_id        = var.flow_log_cloudwatch_log_group_kms_key_arn
-  enable_ipv6                                     = local.enable_ipv6
-  public_subnet_ipv6_native                       = local.ipv6_only
-  private_subnet_ipv6_native                      = local.ipv6_only
-  database_subnet_ipv6_native                     = local.ipv6_only
-  intra_subnet_ipv6_native                        = local.ipv6_only
-  #assign_ipv6_address_on_creation = local.assign_ipv6_address_on_creation
-  public_subnet_assign_ipv6_address_on_creation   = local.public_subnet_assign_ipv6_address_on_creation
-  private_subnet_assign_ipv6_address_on_creation  = local.private_subnet_assign_ipv6_address_on_creation
-  database_subnet_assign_ipv6_address_on_creation = local.database_subnet_assign_ipv6_address_on_creation
-  intra_subnet_assign_ipv6_address_on_creation    = local.intra_subnet_assign_ipv6_address_on_creation
-  public_subnet_ipv6_prefixes                     = local.public_subnet_ipv6_prefixes
-  private_subnet_ipv6_prefixes                    = local.private_subnet_ipv6_prefixes
-  database_subnet_ipv6_prefixes                   = local.database_subnet_ipv6_prefixes
-  intra_subnet_ipv6_prefixes                      = local.intra_subnet_ipv6_prefixes
-
-
-  # TAGS TO BE ASSOCIATED WITH EACH RESOURCE
-
-  tags = tomap(
-    {
-      "Name"        = format("%s-%s-vpc", var.environment, var.name)
-      "Environment" = var.environment
-    },
-  )
-
-  public_subnet_tags = tomap({
-    "Name"                   = "${var.environment}-${var.name}-public-subnet"
-    "Subnet-group"           = "public"
-    "kubernetes.io/role/elb" = 1
-  })
-
-  public_route_table_tags = tomap({
-    "Name" = "${var.environment}-${var.name}-public-route-table"
-  })
-
-  private_subnet_tags = tomap({
-    "Name"                            = "${var.environment}-${var.name}-private-subnet"
-    "Subnet-group"                    = "private"
-    "kubernetes.io/role/internal-elb" = 1
-  })
-
-  private_route_table_tags = tomap({
-    "Name" = "${var.environment}-${var.name}-private-route-table"
-  })
-
-  database_subnet_tags = tomap({
-    "Name"         = "${var.environment}-${var.name}-database-subnet"
-    "Subnet-group" = "database"
-  })
-
-  database_route_table_tags = tomap({
-    "Name" = "${var.environment}-${var.name}-database-route-table"
-  })
-
-  intra_subnet_tags = tomap({
-    "Name"         = "${var.environment}-${var.name}-intra-subnet"
-    "Subnet-group" = "intra"
-  })
-
-  intra_route_table_tags = tomap({
-    "Name" = "${var.environment}-${var.name}-intra-route-table"
-  })
-
-  igw_tags = tomap({
-    "Name" = "${var.environment}-${var.name}-igw"
-  })
-
-  nat_gateway_tags = tomap({
-    "Name" = "${var.environment}-${var.name}-nat"
-  })
-
-  default_network_acl_name = format("%s-%s-nacl", var.environment, var.name)
-  default_network_acl_tags = {
-    "Name"        = format("%s-%s-nacl", var.environment, var.name)
-    "Environment" = var.environment
-  }
-}
-
-module "vpn_server" {
-  count                    = var.vpn_server_enabled && local.is_supported_arch ? 1 : 0
-  depends_on               = [module.vpc]
-  source                   = "./modules/vpn"
-  name                     = var.name
-  vpc_id                   = module.vpc.vpc_id
-  vpc_cidr                 = var.vpc_cidr
-  environment              = var.environment
-  vpn_key_pair             = var.vpn_key_pair_name
-  public_subnet            = module.vpc.public_subnets[0]
-  vpn_server_instance_type = var.vpn_server_instance_type
-}
-
-resource "aws_vpc_ipam" "ipam" {
-  count = var.ipam_enabled && var.create_ipam_pool ? 1 : 0
-  operating_regions {
-    region_name = var.aws_region
-  }
-}
-
-# IPv4
-resource "aws_vpc_ipam_pool" "ipam_pool" {
-  count                             = var.ipam_enabled && var.create_ipam_pool ? 1 : 0
-  description                       = "IPv4 pool"
-  address_family                    = "ipv4"
-  ipam_scope_id                     = aws_vpc_ipam.ipam[0].private_default_scope_id
-  locale                            = var.aws_region
-  allocation_default_netmask_length = 16
-}
-
-resource "aws_vpc_ipam_pool_cidr" "ipam_pool_cidr" {
-  count        = var.ipam_enabled ? 1 : 0
-  ipam_pool_id = var.create_ipam_pool ? aws_vpc_ipam_pool.ipam_pool[0].id : var.ipam_pool_id
-  cidr         = var.create_ipam_pool ? var.vpc_cidr : var.existing_ipam_managed_cidr
-}
-
-# private links for S3
-
-data "aws_route_tables" "aws_private_routes" {
-  count      = var.vpc_s3_endpoint_enabled ? 1 : 0
-  depends_on = [module.vpc]
-  vpc_id     = module.vpc.vpc_id
-  tags = {
-    Name = "${var.environment}-${var.name}-private-route-table"
-  }
-}
-
-resource "aws_vpc_endpoint" "private-s3" {
-  count             = var.vpc_s3_endpoint_enabled ? 1 : 0
-  depends_on        = [data.aws_route_tables.aws_private_routes]
-  vpc_id            = module.vpc.vpc_id
-  service_name      = "com.amazonaws.${var.aws_region}.s3"
-  route_table_ids   = data.aws_route_tables.aws_private_routes[0].ids
-  vpc_endpoint_type = "Gateway"
-  policy            = <<POLICY
-{
-    "Statement": [
-        {
-            "Action": "*",
-            "Effect": "Allow",
-            "Resource": "*",
-            "Principal": "*"
-        }
-    ]
-}
-POLICY
-  tags = {
-    Name = "${var.environment}-${var.name}-endpoint"
-  }
-}
-
-# allow 443 to access ecr repo
-resource "aws_security_group" "vpc_endpoints" {
-  count       = var.vpc_ecr_endpoint_enabled ? 1 : 0
-  name_prefix = "${var.environment}-vpc-endpoints"
-  description = "Associated to ECR/s3 VPC Endpoints"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    description = "Allow Nodes to pull images from ECR via VPC endpoints"
-    protocol    = "tcp"
-    from_port   = 443
-    to_port     = 443
-    cidr_blocks = [var.vpc_cidr]
-  }
-}
-# private links for ECR.dkr
-
-resource "aws_vpc_endpoint" "private-ecr-dkr" {
-  count               = var.vpc_ecr_endpoint_enabled ? 1 : 0
-  depends_on          = [data.aws_route_tables.aws_private_routes]
-  vpc_id              = module.vpc.vpc_id
-  service_name        = "com.amazonaws.${var.aws_region}.ecr.dkr"
-  subnet_ids          = module.vpc.private_subnets
-  security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
-  policy              = <<POLICY
-{
-    "Statement": [
-        {
-            "Action": "*",
-            "Effect": "Allow",
-            "Resource": "*",
-            "Principal": "*"
-        }
-    ]
-}
-POLICY
-  tags = {
-    Name = "${var.environment}-${var.name}-ecr-dkr-endpoint"
-  }
-}
-
-# private links for ECR.api
-
-resource "aws_vpc_endpoint" "private-ecr-api" {
-  count               = var.vpc_ecr_endpoint_enabled ? 1 : 0
-  depends_on          = [data.aws_route_tables.aws_private_routes]
-  vpc_id              = module.vpc.vpc_id
-  subnet_ids          = module.vpc.private_subnets
-  service_name        = "com.amazonaws.${var.aws_region}.ecr.api"
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
-  policy              = <<POLICY
-{
-    "Statement": [
-        {
-            "Action": "ecr.api",
-            "Effect": "Allow",
-            "Resource": "*",
-            "Principal": "*"
-        }
-    ]
-}
-POLICY
-  tags = {
-    Name = "${var.environment}-${var.name}-ecr-api-endpoint"
-  }
+  source                                              = "../../"
+  name                                                = local.vpc_name
+  aws_region                                          = local.aws_region
+  vpc_cidr                                            = local.vpc_cidr
+  environment                                         = local.environment
+  vpc_flow_log_enabled                                = local.vpc_flow_log_enabled
+  vpn_key_pair_name                                   = module.key_pair_vpn.key_pair_name
+  vpc_availability_zones                              = local.vpc_availability_zones
+  vpn_server_enabled                                  = local.vpn_server_enabled
+  vpc_intra_subnet_enabled                            = local.vpc_intra_subnet_enabled
+  vpc_public_subnet_enabled                           = local.vpc_public_subnet_enabled
+  auto_assign_public_ip                               = local.auto_assign_public_ip
+  vpc_private_subnet_enabled                          = local.vpc_private_subnet_enabled
+  vpc_one_nat_gateway_per_az                          = local.vpc_one_nat_gateway_per_az
+  database_subnet_enabled                             = local.vpc_database_subnet_enabled
+  vpn_server_instance_type                            = local.vpn_server_instance_type
+  vpc_s3_endpoint_enabled                             = local.vpc_s3_endpoint_enabled
+  vpc_ecr_endpoint_enabled                            = local.vpc_ecr_endpoint_enabled
+  vpc_flow_log_max_aggregation_interval               = 60 # In seconds
+  vpc_flow_log_cloudwatch_log_group_skip_destroy      = local.vpc_flow_log_cloudwatch_log_group_skip_destroy
+  vpc_flow_log_cloudwatch_log_group_retention_in_days = 90
+  vpc_flow_log_cloudwatch_log_group_kms_key_arn       = module.kms.key_arn #Enter your kms key arn
 }
