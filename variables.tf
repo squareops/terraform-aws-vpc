@@ -364,13 +364,13 @@ variable "vpc_endpoint_type_ecr_api" {
   default     = "Interface"
 }
 
-variable "vpc_endpoint_type_ecr-dkr" {
+variable "vpc_endpoint_type_ecr_dkr" {
   description = "The type of VPC endpoint for ECR Docker"
   type        = string
   default     = "Interface"
 }
 
-variable "vpc_endpoint_type_private-s3" {
+variable "vpc_endpoint_type_private_s3" {
   description = "The type of VPC endpoint for ECR Docker"
   type        = string
   default     = "Interface"
