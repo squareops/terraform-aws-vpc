@@ -334,30 +334,6 @@ variable "database_nat_gateway_route_enabled" {
   default     = false
 }
 
-variable "vpc_default_security_group_ingress" {
-  description = "List of ingress rules for the default security group"
-  type        = list(object({
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
-    description = string
-  }))
-  default     = []
-}
-
-variable "vpc_default_security_group_egress" {
-  description = "List of egress rules for the default security group"
-  type        = list(object({
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
-    description = string
-  }))
-  default     = []
-}
-
 variable "vpc_endpoint_type_ecr_api" {
   description = "The type of VPC endpoint for ECR api"
   type        = string
@@ -373,11 +349,48 @@ variable "vpc_endpoint_type_ecr_dkr" {
 variable "vpc_endpoint_type_private_s3" {
   description = "The type of VPC endpoint for ECR Docker"
   type        = string
-  default     = "Interface"
+  default     = "Gateway"
 }
 
 variable "ipam_address_family" {
   description = "The address family for the VPC (ipv4 or ipv6)"
   type        = string
   default     = "ipv4"
+}
+
+# Define input variables to accept subnet counts
+variable "vpc_public_subnets_counts" {
+  description = "List of counts for public subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_private_subnets_counts" {
+  description = "List of counts for private subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_database_subnets_counts" {
+  description = "List of counts for database subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_intra_subnets_counts" {
+  description = "List of counts for intra subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_default_security_group_ingress" {
+  description = "List of maps of ingress rules to set on the default security group"
+  type        = list(map(string))
+  default     = []
+}
+
+variable "vpc_default_security_group_egress" {
+  description = "List of maps of egress rules to set on the default security group"
+  type        = list(map(string))
+  default     = []
 }
