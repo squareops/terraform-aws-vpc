@@ -221,7 +221,7 @@ data "aws_route_tables" "aws_private_routes" {
   }
 }
 
-resource "aws_vpc_endpoint" "private-s3" {
+resource "aws_vpc_endpoint" "private_s3" {
   count             = var.vpc_s3_endpoint_enabled ? 1 : 0
   depends_on        = [data.aws_route_tables.aws_private_routes]
   vpc_id            = module.vpc.vpc_id
@@ -262,7 +262,7 @@ resource "aws_security_group" "vpc_endpoints" {
 }
 # private links for ECR.dkr
 
-resource "aws_vpc_endpoint" "private-ecr-dkr" {
+resource "aws_vpc_endpoint" "private-ecr_dkr" {
   count               = var.vpc_ecr_endpoint_enabled ? 1 : 0
   depends_on          = [data.aws_route_tables.aws_private_routes]
   vpc_id              = module.vpc.vpc_id
@@ -290,7 +290,7 @@ POLICY
 
 # private links for ECR.api
 
-resource "aws_vpc_endpoint" "private-ecr-api" {
+resource "aws_vpc_endpoint" "private-ecr_api" {
   count               = var.vpc_ecr_endpoint_enabled ? 1 : 0
   depends_on          = [data.aws_route_tables.aws_private_routes]
   vpc_id              = module.vpc.vpc_id
