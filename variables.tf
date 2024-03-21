@@ -1,3 +1,25 @@
+variable "additional_tags" {
+  description = "Additional tags to be applied to AWS resources"
+  type        = map(string)
+  default = {
+    Owner      = "organization_name"
+    Expires    = "Never"
+    Department = "Engineering"
+  }
+}
+
+variable "aws_region" {
+  description = "Name of the AWS region where VPC  is to be created."
+  default     = ""
+  type        = string
+}
+
+variable "aws_account_id" {
+  description = "Account ID of the AWS Account."
+  default     = "1234567890"
+  type        = string
+}
+
 variable "environment" {
   description = "Specify the environment indentifier for the VPC"
   type        = string
@@ -17,55 +39,55 @@ variable "vpc_cidr" {
   type        = string
 }
 
-variable "availability_zones" {
-  description = "Number of Availability Zone to be used by VPC Subnets"
+variable "vpc_availability_zones" {
+  description = "Number of Availability Zone to be used by VPC Subnets."
   default     = []
   type        = list(any)
 }
 
-variable "public_subnet_enabled" {
+variable "vpc_public_subnet_enabled" {
   description = "Set true to enable public subnets"
   default     = false
   type        = bool
 }
 
-variable "public_subnet_cidrs" {
+variable "vpc_public_subnet_cidrs" {
   description = "A list of public subnets CIDR to be created inside the VPC"
   default     = []
   type        = list(any)
 }
 
-variable "private_subnet_enabled" {
+variable "vpc_private_subnet_enabled" {
   description = "Set true to enable private subnets"
   default     = false
   type        = bool
 }
 
-variable "private_subnet_cidrs" {
+variable "vpc_private_subnet_cidrs" {
   description = "A list of private subnets CIDR to be created inside the VPC"
   default     = []
   type        = list(any)
 }
 
-variable "database_subnet_enabled" {
+variable "vpc_database_subnet_enabled" {
   description = "Set true to enable database subnets"
   default     = false
   type        = bool
 }
 
-variable "database_subnet_cidrs" {
+variable "vpc_database_subnet_cidrs" {
   description = "Database Tier subnet CIDRs to be created"
   default     = []
   type        = list(any)
 }
 
-variable "intra_subnet_enabled" {
+variable "vpc_intra_subnet_enabled" {
   description = "Set true to enable intra subnets"
   default     = false
   type        = bool
 }
 
-variable "intra_subnet_cidrs" {
+variable "vpc_intra_subnet_cidrs" {
   description = "A list of intra subnets CIDR to be created"
   default     = []
   type        = list(any)
@@ -83,7 +105,7 @@ variable "vpn_server_instance_type" {
   type        = string
 }
 
-variable "vpn_key_pair_name" {
+variable "vpn_server_key_pair_name" {
   description = "Specify the name of AWS Keypair to be used for VPN Server"
   default     = ""
   type        = string
@@ -129,25 +151,25 @@ variable "default_network_acl_ingress" {
   ]
 }
 
-variable "one_nat_gateway_per_az" {
+variable "vpc_one_nat_gateway_per_az" {
   description = "Set to true if a NAT Gateway is required per availability zone for Private Subnet Tier"
   default     = false
   type        = bool
 }
 
-variable "flow_log_enabled" {
+variable "vpc_flow_log_enabled" {
   description = "Whether or not to enable VPC Flow Logs"
   type        = bool
   default     = false
 }
 
-variable "flow_log_cloudwatch_log_group_retention_in_days" {
+variable "vpc_flow_log_cloudwatch_log_group_retention_in_days" {
   description = "Specifies the number of days you want to retain log events in the specified log group for VPC flow logs."
   type        = number
   default     = null
 }
 
-variable "flow_log_max_aggregation_interval" {
+variable "vpc_flow_log_max_aggregation_interval" {
   description = "The maximum interval of time during which a flow of packets is captured and aggregated into a flow log record. Valid Values: `60` seconds or `600` seconds."
   type        = number
   default     = 60
@@ -192,7 +214,7 @@ variable "intra_subnet_assign_ipv6_address_on_creation" {
   default     = null
 }
 
-variable "flow_log_cloudwatch_log_group_kms_key_arn" {
+variable "vpc_flow_log_cloudwatch_log_group_kms_key_arn" {
   description = "The ARN of the KMS Key to use when encrypting log data for VPC flow logs"
   type        = string
   default     = null
@@ -216,17 +238,11 @@ variable "secondry_cidr_enabled" {
   type        = bool
 }
 
-variable "enable_database_subnet_group" {
+variable "database_subnet_group_enabled" {
   description = "Whether create database subnet groups"
   default     = false
   type        = bool
 }
-
-# variable "tags" {
-#   description = "The Tags attached with the resources"
-#   default = {}
-#   type = any
-# }
 
 variable "ipam_pool_id" {
   description = "The existing IPAM pool id if any"
@@ -240,7 +256,7 @@ variable "ipam_enabled" {
   type        = bool
 }
 
-variable "create_ipam_pool" {
+variable "ipam_pool_enabled" {
   description = "Whether create new IPAM pool"
   default     = true
   type        = bool
@@ -252,19 +268,13 @@ variable "ipv4_netmask_length" {
   type        = number
 }
 
-variable "region" {
-  description = "The AWS region name"
-  type        = string
-  default     = null
-}
-
 variable "existing_ipam_managed_cidr" {
   description = "The existing IPAM pool CIDR"
   default     = ""
   type        = string
 }
 
-variable "flow_log_cloudwatch_log_group_skip_destroy" {
+variable "vpc_flow_log_cloudwatch_log_group_skip_destroy" {
   description = " Set to true if you do not wish the log group (and any logs it may contain) to be deleted at destroy time, and instead just remove the log group from the Terraform state"
   type        = bool
   default     = false
@@ -280,4 +290,107 @@ variable "vpc_ecr_endpoint_enabled" {
   description = "Set to true if you want to enable vpc ecr endpoints"
   type        = bool
   default     = false
+}
+
+variable "vpn_gateway_enabled" {
+  description = "Whether to enable vpn Gateway"
+  type        = bool
+  default     = false
+}
+
+variable "dns_hostnames_enabled" {
+  description = "Whether to enable DNS hostnames"
+  type        = bool
+  default     = true
+}
+
+variable "vpc_manage_default_network_acl" {
+  description = "Should be true to manage Default Network ACL"
+  type        = bool
+  default     = true
+}
+
+variable "vpc_flow_log_traffic_type" {
+  description = "The type of traffic to capture. Valid values: ACCEPT, REJECT, ALL"
+  type        = string
+  default     = "ALL"
+}
+
+variable "vpc_flow_log_destination_type" {
+  description = "Type of flow log destination. Can be s3 or cloud-watch-logs"
+  type        = string
+  default     = "cloud-watch-logs"
+}
+
+variable "manage_vpc_default_security_group" {
+  description = "Should be true to manage Default Security group of vpc"
+  type        = bool
+  default     = true
+}
+
+variable "database_nat_gateway_route_enabled" {
+  description = "Nat Gateway route to be created for internet access to database subnets"
+  type        = bool
+  default     = false
+}
+
+variable "vpc_endpoint_type_ecr_api" {
+  description = "The type of VPC endpoint for ECR api"
+  type        = string
+  default     = "Interface"
+}
+
+variable "vpc_endpoint_type_ecr_dkr" {
+  description = "The type of VPC endpoint for ECR Docker"
+  type        = string
+  default     = "Interface"
+}
+
+variable "vpc_endpoint_type_private_s3" {
+  description = "The type of VPC endpoint for ECR Docker"
+  type        = string
+  default     = "Gateway"
+}
+
+variable "ipam_address_family" {
+  description = "The address family for the VPC (ipv4 or ipv6)"
+  type        = string
+  default     = "ipv4"
+}
+
+# Define input variables to accept subnet counts
+variable "vpc_public_subnets_counts" {
+  description = "List of counts for public subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_private_subnets_counts" {
+  description = "List of counts for private subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_database_subnets_counts" {
+  description = "List of counts for database subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_intra_subnets_counts" {
+  description = "List of counts for intra subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_default_security_group_ingress" {
+  description = "List of maps of ingress rules to set on the default security group"
+  type        = list(map(string))
+  default     = []
+}
+
+variable "vpc_default_security_group_egress" {
+  description = "List of maps of egress rules to set on the default security group"
+  type        = list(map(string))
+  default     = []
 }
