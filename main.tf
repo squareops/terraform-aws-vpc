@@ -1,5 +1,5 @@
 locals {
-  azs                   = length(var.vpc_availability_zones)
+  azs = length(var.vpc_availability_zones)
   # public subnets cidr
   public_subnets_native = var.vpc_public_subnet_enabled ? length(var.vpc_public_subnet_cidrs) > 0 ? var.vpc_public_subnet_cidrs : [for netnum in range(0, var.vpc_public_subnets_counts) : cidrsubnet(var.vpc_cidr, 8, netnum)] : []
   secondary_public_subnets = var.vpc_public_subnet_enabled && var.secondry_cidr_enabled ? [
@@ -7,7 +7,7 @@ locals {
       for netnum in range(0, var.vpc_public_subnets_counts) : cidrsubnet(cidr_block, 8, netnum)
     ]
   ] : []
-  vpc_public_subnets       = concat(local.public_subnets_native, flatten(local.secondary_public_subnets))
+  vpc_public_subnets = concat(local.public_subnets_native, flatten(local.secondary_public_subnets))
 
   # intra subnets cidr
   intra_subnets_native = var.vpc_intra_subnet_enabled ? length(var.vpc_intra_subnet_cidrs) > 0 ? var.vpc_intra_subnet_cidrs : [for netnum in range(var.vpc_intra_subnets_counts * 3, var.vpc_intra_subnets_counts * 4) : cidrsubnet(var.vpc_cidr, 4, netnum)] : []
@@ -16,8 +16,8 @@ locals {
       for netnum in range(var.vpc_intra_subnets_counts * 3, var.vpc_intra_subnets_counts * 4) : cidrsubnet(cidr_block, 8, netnum)
     ]
   ] : []
-  vpc_intra_subnets          = concat(local.intra_subnets_native, flatten(local.secondary_intra_subnets))
-  
+  vpc_intra_subnets = concat(local.intra_subnets_native, flatten(local.secondary_intra_subnets))
+
   # private subnets cidr
   private_subnets_native = var.vpc_private_subnet_enabled ? length(var.vpc_private_subnet_cidrs) > 0 ? var.vpc_private_subnet_cidrs : [for netnum in range(var.vpc_private_subnets_counts * 4, var.vpc_private_subnets_counts * 5) : cidrsubnet(var.vpc_cidr, 8, netnum)] : []
   secondary_private_subnets = var.vpc_private_subnet_enabled && var.secondry_cidr_enabled ? [
@@ -25,8 +25,8 @@ locals {
       for netnum in range(var.vpc_private_subnets_counts, var.vpc_private_subnets_counts * 2) : cidrsubnet(cidr_block, 4, netnum)
     ]
   ] : []
-  vpc_private_subnets         = concat(local.private_subnets_native, flatten(local.secondary_private_subnets))
-  
+  vpc_private_subnets = concat(local.private_subnets_native, flatten(local.secondary_private_subnets))
+
   # database subnets cidr
   database_subnets_native = var.vpc_database_subnet_enabled ? length(var.vpc_database_subnet_cidrs) > 0 ? var.vpc_database_subnet_cidrs : [for netnum in range(var.vpc_database_subnets_counts * 2, var.vpc_database_subnets_counts * 3) : cidrsubnet(var.vpc_cidr, 8, netnum)] : []
   secondary_database_subnets = var.vpc_database_subnet_enabled && var.secondry_cidr_enabled ? [
@@ -34,8 +34,8 @@ locals {
       for netnum in range(var.vpc_database_subnets_counts * 2, var.vpc_database_subnets_counts * 3) : cidrsubnet(cidr_block, 8, netnum)
     ]
   ] : []
-  vpc_database_subnets                     = concat(local.database_subnets_native, flatten(local.secondary_database_subnets))
-  vpc_single_nat_gateway                   = var.vpc_one_nat_gateway_per_az == true ? false : true
+  vpc_database_subnets                 = concat(local.database_subnets_native, flatten(local.secondary_database_subnets))
+  vpc_single_nat_gateway               = var.vpc_one_nat_gateway_per_az == true ? false : true
   create_database_subnet_route_table   = var.vpc_database_subnet_enabled
   create_flow_log_cloudwatch_log_group = var.vpc_flow_log_enabled == true || var.vpc_flow_log_cloudwatch_log_group_skip_destroy == true ? true : false
   is_supported_arch                    = data.aws_ec2_instance_type.arch.supported_architectures[0] == "arm64" ? false : true # for VPN Instance
@@ -65,7 +65,6 @@ data "aws_availability_zones" "available" {}
 data "aws_ec2_instance_type" "arch" {
   instance_type = var.vpn_server_instance_type
 }
-
 module "vpc" {
   source                                          = "terraform-aws-modules/vpc/aws"
   version                                         = "5.2.0"
@@ -269,12 +268,12 @@ resource "aws_security_group" "vpc_endpoints" {
 }
 # private links for ECR.dkr
 
-resource "aws_vpc_endpoint" "private-ecr_dkr" {
+resource "aws_vpc_endpoint" "private_ecr_dkr" {
   count               = var.vpc_ecr_endpoint_enabled ? 1 : 0
   depends_on          = [data.aws_route_tables.aws_private_routes]
   vpc_id              = module.vpc.vpc_id
   service_name        = "com.amazonaws.${var.aws_region}.ecr.dkr"
-  subnet_ids          = module.vpc.private_subnets
+  subnet_ids          = [module.vpc.private_subnets[count.index]]
   security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
   vpc_endpoint_type   = var.vpc_endpoint_type_ecr_dkr
   private_dns_enabled = true
@@ -297,11 +296,11 @@ POLICY
 
 # private links for ECR.api
 
-resource "aws_vpc_endpoint" "private-ecr_api" {
+resource "aws_vpc_endpoint" "private_ecr_api" {
   count               = var.vpc_ecr_endpoint_enabled ? 1 : 0
   depends_on          = [data.aws_route_tables.aws_private_routes]
   vpc_id              = module.vpc.vpc_id
-  subnet_ids          = module.vpc.private_subnets
+  subnet_ids          = [module.vpc.private_subnets[count.index]]
   service_name        = "com.amazonaws.${var.aws_region}.ecr.api"
   vpc_endpoint_type   = var.vpc_endpoint_type_ecr_api
   private_dns_enabled = true

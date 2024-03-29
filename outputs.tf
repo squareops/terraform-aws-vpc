@@ -1,8 +1,3 @@
-# output "aws_region" {
-#   description = "AWS Region in which VPC is created"
-#   value       = local.aws_region
-# }
-
 output "vpc_id" {
   description = "The ID of the VPC"
   value       = module.vpc.vpc_id
@@ -15,30 +10,30 @@ output "vpc_cidr_block" {
 
 output "vpc_public_subnets" {
   description = "List of IDs of public subnets"
-  value       = module.vpc.vpc_public_subnets
+  value       = length(module.vpc.public_subnets) > 0 ? module.vpc.public_subnets : null
 }
 
 output "vpc_private_subnets" {
   description = "List of IDs of private subnets"
-  value       = module.vpc.vpc_private_subnets
+  value       = length(module.vpc.private_subnets) > 0 ? module.vpc.private_subnets : null
 }
 
 output "database_subnets" {
   description = "List of IDs of database subnets"
-  value       = module.vpc.database_subnets
+  value       = length(module.vpc.database_subnets) > 0 ? module.vpc.database_subnets : null
 }
 
 output "vpc_intra_subnets" {
   description = "List of IDs of Intra subnets"
-  value       = module.vpc.vpc_intra_subnets
+  value       = length(module.vpc.intra_subnets) > 0 ? module.vpc.intra_subnets : null
 }
 
 output "vpn_host_public_ip" {
   description = "IP Adress of VPN Server"
-  value       = module.vpc.vpn_host_public_ip
+  value       = var.vpn_server_enabled ? module.vpn_server[0].vpn_host_public_ip : null
 }
 
 output "vpn_security_group" {
   description = "Security Group ID of VPN Server"
-  value       = module.vpc.vpn_security_group
+  value       = var.vpn_server_enabled ? module.vpn_server[0].vpn_security_group : null
 }

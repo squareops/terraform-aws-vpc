@@ -48,7 +48,7 @@ resource "aws_vpc_peering_connection" "this" {
   peer_owner_id = var.vpc_peering_multi_account_enabled ? data.aws_caller_identity.accepter.id : null
   provider      = aws.peer
   tags = {
-    Name = format("%s-%s-%s", var.requester_name, "to", var.accepter_name)
+    Name = format("%s-%s-%s", var.vpc_peering_requester_name, "to", var.vpc_peering_accepter_name)
   }
 }
 
@@ -59,7 +59,7 @@ resource "aws_vpc_peering_connection_accepter" "this" {
   vpc_peering_connection_id = aws_vpc_peering_connection.this[0].id
   auto_accept               = true
   tags = {
-    Name = format("%s-%s-%s", var.requester_name, "to", var.accepter_name)
+    Name = format("%s-%s-%s", var.vpc_peering_requester_name, "to", var.vpc_peering_accepter_name)
   }
 }
 

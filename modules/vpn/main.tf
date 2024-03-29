@@ -5,7 +5,7 @@ resource "aws_eip" "vpn" {
 
 module "security_group_vpn" {
   source      = "terraform-aws-modules/security-group/aws"
-  version     = "4.13.0"
+  version     = "5.1.0"
   create      = true
   name        = format("%s-%s-%s", var.environment, var.name, "vpn-sg")
   description = "vpn server security group"
@@ -83,7 +83,7 @@ data "aws_region" "current" {}
 
 module "vpn_server" {
   source                      = "terraform-aws-modules/ec2-instance/aws"
-  version                     = "4.1.4"
+  version                     = "5.6.0"
   name                        = format("%s-%s-%s", var.environment, var.name, "vpn-ec2-instance")
   ami                         = data.aws_ami.ubuntu_20_ami.image_id
   instance_type               = var.vpn_server_instance_type
@@ -92,7 +92,7 @@ module "vpn_server" {
   associate_public_ip_address = true
   vpc_security_group_ids      = [module.security_group_vpn.security_group_id]
   user_data                   = join("", data.template_file.pritunl[*].rendered)
-  iam_instance_profile        = join("", aws_iam_instance_profile.vpn_SSM[*].name)
+  iam_instance_profile        = join("", aws_iam_instance_profile.vpn_ssm[*].name)
 
 
   root_block_device = [
@@ -141,12 +141,12 @@ resource "aws_iam_role_policy_attachment" "SSMManagedInstanceCore_attachment" {
   policy_arn = data.aws_iam_policy.SSMManagedInstanceCore.arn
 }
 
-resource "aws_iam_instance_profile" "vpn_SSM" {
+resource "aws_iam_instance_profile" "vpn_ssm" {
   name = format("%s-%s-%s", var.environment, var.name, "vpnEC2InstanceProfile")
   role = join("", aws_iam_role.vpn_role[*].name)
 }
 
-resource "time_sleep" "wait_3_min" {
+resource "time_sleep" "vpn_wait_3_min" {
   depends_on      = [module.vpn_server]
   create_duration = "3m"
 }
@@ -160,18 +160,18 @@ resource "aws_iam_role_policy_attachment" "SecretsManagerReadWrite_attachment" {
   policy_arn = data.aws_iam_policy.SecretsManagerReadWrite.arn
 }
 
-resource "aws_ssm_association" "ssm_association" {
-  name       = aws_ssm_document.ssm_document.name
-  depends_on = [time_sleep.wait_3_min]
+resource "aws_ssm_association" "vpn_ssm_association" {
+  name       = aws_ssm_document.vpn_ssm_document.name
+  depends_on = [time_sleep.vpn_wait_3_min]
   targets {
     key    = "InstanceIds"
     values = [module.vpn_server.id]
   }
 }
 
-resource "aws_ssm_document" "ssm_document" {
+resource "aws_ssm_document" "vpn_ssm_document" {
   name          = format("%s-%s-%s", var.environment, var.name, "ssm_document_create_secret")
-  depends_on    = [time_sleep.wait_3_min]
+  depends_on    = [time_sleep.vpn_wait_3_min]
   document_type = "Command"
   content       = <<DOC
   {
@@ -204,7 +204,7 @@ resource "aws_ssm_document" "ssm_document" {
 DOC
 }
 
-resource "null_resource" "delete_secret" {
+resource "null_resource" "vpn_delete_secret" {
   triggers = {
     environment = var.environment
     name        = var.name

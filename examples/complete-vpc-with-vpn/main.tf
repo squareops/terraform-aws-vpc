@@ -5,12 +5,12 @@ locals {
   environment                                    = "prod"
   kms_user                                       = null
   vpc_cidr                                       = "10.10.0.0/16"
-  vpc_availability_zones                         = ["ap-northeast-1a", "ap-northeast-1b"]
+  vpc_availability_zones                         = ["ap-northeast-1a", "ap-northeast-1c"]
   kms_deletion_window_in_days                    = 7
   enable_key_rotation                            = false
   is_enabled                                     = true
-  vpc_flow_log_enabled                           = true
-  vpn_server_enabled                             = false
+  vpc_flow_log_enabled                           = false
+  vpn_server_enabled                             = true
   vpc_intra_subnet_enabled                       = true
   vpc_public_subnet_enabled                      = true
   auto_assign_public_ip                          = true

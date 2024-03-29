@@ -22,13 +22,13 @@ variable "vpc_peering_requester_vpc_region" {
   default     = ""
 }
 
-variable "requester_name" {
+variable "vpc_peering_requester_name" {
   type        = string
   description = "Provide a descriptive name or label for the VPC Requester. This helps identify and differentiate the Requester VPC in the peering connection."
   default     = ""
 }
 
-variable "accepter_name" {
+variable "vpc_peering_accepter_name" {
   type        = string
   description = "Assign a meaningful name or label to the VPC Accepter. This aids in distinguishing the Accepter VPC within the VPC peering connection."
   default     = ""
