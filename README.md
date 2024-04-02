@@ -29,23 +29,30 @@ module "vpc" {
   ipv6_enabled                                    = true
   create_ipam_pool                                = false
   ipam_enabled                                    = false
-  flow_log_enabled                                = true
-  vpn_key_pair_name                               = module.key_pair_vpn.key_pair_name
-  availability_zones                              = ["us-east-1a", "us-east-1b"]
+  vpc_flow_log_enabled                            = true
+  vpn_server_key_pair_name                        = module.key_pair_vpn.key_pair_name
+  vpc_availability_zones                          = ["us-east-1a", "us-east-1b"]
   vpn_server_enabled                              = false
-  intra_subnet_enabled                            = true
+  vpc_intra_subnet_enabled                        = true
   auto_assign_public_ip                           = true
-  public_subnet_enabled                           = true
-  private_subnet_enabled                          = true
-  one_nat_gateway_per_az                          = true
-  database_subnet_enabled                         = true
+  vpc_public_subnet_enabled                       = true
+  vpc_private_subnet_enable                       = true
+  vpc_one_nat_gateway_per_az                      = true
+  vpc_database_subnet_enabled                     = true
   vpn_server_instance_type                        = "t3a.small"
+  vpc_public_subnets_counts                       = 2
+  vpc_private_subnets_counts                      = 2
+  vpc_database_subnets_counts                     = 2
+  vpc_intra_subnets_counts                        = 2
+  vpc_endpoint_type_private_s3                    = "Gateway"
+  vpc_endpoint_type_ecr_dkr                       = "Interface"
+  vpc_endpoint_type_ecr_api                       = "Interface"
   vpc_s3_endpoint_enabled                         = true
   vpc_ecr_endpoint_enabled                        = true
-  flow_log_max_aggregation_interval               = 60
-  flow_log_cloudwatch_log_group_skip_destroy      = true
-  flow_log_cloudwatch_log_group_retention_in_days = 90
-  flow_log_cloudwatch_log_group_kms_key_arn       = "arn:aws:kms:us-east-2:222222222222:key/kms_key_arn" #Enter your kms key arn
+  vpc_flow_log_max_aggregation_interval           = 60
+  vpc_flow_log_cloudwatch_log_group_skip_destroy  = true
+  vpc_flow_log_cloudwatch_log_group_retention_in_days = 90
+  vpc_flow_log_cloudwatch_log_group_kms_key_arn   = "arn:aws:kms:us-east-2:222222222222:key/kms_key_arn" #Enter your kms key arn
 }
 ```
 Refer [this](https://github.com/squareops/terraform-aws-vpc/tree/main/examples) for more examples.

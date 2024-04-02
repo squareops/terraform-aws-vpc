@@ -1,3 +1,8 @@
+variable "aws_region" {
+  description = "Name of the AWS region where S3 bucket is to be created."
+  default     = ""
+  type        = string
+}
 
 variable "vpn_server_instance_type" {
   description = "EC2 instance Type for VPN Server, Only amd64 based instance type are supported eg. t2.medium, t3.micro, c5a.large etc. "
@@ -17,7 +22,7 @@ variable "name" {
   type        = string
 }
 
-variable "public_subnet" {
+variable "public_subnet_ids" {
   description = "The VPC Subnet ID to launch in"
   default     = ""
   type        = string
@@ -35,7 +40,7 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "vpn_key_pair" {
+variable "vpn_key_pair_name" {
   description = "Specify the name of AWS Keypair to be used for VPN Server"
   default     = ""
   type        = string

@@ -5,33 +5,33 @@ locals {
 
 provider "aws" {
   alias   = "peer"
-  region  = var.vpc_peering_requester_vpc_region
+  region  = var.vpc_peering_requester_region
   profile = var.vpc_peering_multi_account_enabled ? var.vpc_peering_requester_aws_profile : "default"
 }
 
 provider "aws" {
   alias   = "accepter"
-  region  = var.vpc_peering_accepter_vpc_region
+  region  = var.vpc_peering_accepter_region
   profile = var.vpc_peering_multi_account_enabled ? var.vpc_peering_accepter_aws_profile : "default"
 }
 
 data "aws_vpc" "accepter" {
-  id       = var.vpc_peering_accepter_vpc_id
+  id       = var.vpc_peering_accepter_id
   provider = aws.accepter
 }
 
 data "aws_route_tables" "accepter" {
-  vpc_id   = var.vpc_peering_accepter_vpc_id
+  vpc_id   = var.vpc_peering_accepter_id
   provider = aws.accepter
 }
 
 data "aws_vpc" "requester" {
-  id       = var.vpc_peering_requester_vpc_id
+  id       = var.vpc_peering_requester_id
   provider = aws.peer
 }
 
 data "aws_route_tables" "requester" {
-  vpc_id   = var.vpc_peering_requester_vpc_id
+  vpc_id   = var.vpc_peering_requester_id
   provider = aws.peer
 }
 
@@ -41,9 +41,9 @@ data "aws_caller_identity" "accepter" {
 
 resource "aws_vpc_peering_connection" "this" {
   count         = var.vpc_peering_enabled ? 1 : 0
-  vpc_id        = var.vpc_peering_requester_vpc_id
-  peer_vpc_id   = var.vpc_peering_accepter_vpc_id
-  peer_region   = var.vpc_peering_multi_account_enabled ? var.vpc_peering_accepter_vpc_region : null
+  vpc_id        = var.vpc_peering_requester_id
+  peer_vpc_id   = var.vpc_peering_accepter_id
+  peer_region   = var.vpc_peering_multi_account_enabled ? var.vpc_peering_accepter_region : null
   auto_accept   = false
   peer_owner_id = var.vpc_peering_multi_account_enabled ? data.aws_caller_identity.accepter.id : null
   provider      = aws.peer
