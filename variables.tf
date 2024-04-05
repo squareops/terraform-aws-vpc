@@ -3,6 +3,7 @@ variable "additional_aws_tags" {
   description = "Additional tags to be applied to AWS resources"
   type        = map(string)
   default     = {}
+}
 
 variable "additional_tags" {
   description = "Additional tags to be applied to AWS resources"
