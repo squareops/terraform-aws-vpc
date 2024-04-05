@@ -1,3 +1,9 @@
+
+variable "additional_aws_tags" {
+  description = "Additional tags to be applied to AWS resources"
+  type        = map(string)
+  default     = {}
+=======
 variable "additional_tags" {
   description = "Additional tags to be applied to AWS resources"
   type        = map(string)
@@ -6,6 +12,7 @@ variable "additional_tags" {
     Expires    = "Never"
     Department = "Engineering"
   }
+
 }
 
 variable "aws_region" {
@@ -69,13 +76,13 @@ variable "vpc_private_subnet_cidrs" {
   type        = list(any)
 }
 
-variable "database_subnet_enabled" {
+variable "vpc_database_subnet_enabled" {
   description = "Set true to enable database subnets"
   default     = false
   type        = bool
 }
 
-variable "database_subnet_cidrs" {
+variable "vpc_database_subnet_cidrs" {
   description = "Database Tier subnet CIDRs to be created"
   default     = []
   type        = list(any)
@@ -105,7 +112,7 @@ variable "vpn_server_instance_type" {
   type        = string
 }
 
-variable "vpn_key_pair_name" {
+variable "vpn_server_key_pair_name" {
   description = "Specify the name of AWS Keypair to be used for VPN Server"
   default     = ""
   type        = string
@@ -214,7 +221,7 @@ variable "intra_subnet_assign_ipv6_address_on_creation" {
   default     = null
 }
 
-variable "flow_log_cloudwatch_log_group_kms_key_arn" {
+variable "vpc_flow_log_cloudwatch_log_group_kms_key_arn" {
   description = "The ARN of the KMS Key to use when encrypting log data for VPC flow logs"
   type        = string
   default     = null
@@ -256,7 +263,7 @@ variable "ipam_enabled" {
   type        = bool
 }
 
-variable "create_ipam_pool" {
+variable "ipam_pool_enabled" {
   description = "Whether create new IPAM pool"
   default     = true
   type        = bool
@@ -328,20 +335,69 @@ variable "manage_vpc_default_security_group" {
   default     = true
 }
 
-variable "create_database_nat_gateway_route" {
+variable "database_nat_gateway_route_enabled" {
   description = "Nat Gateway route to be created for internet access to database subnets"
   type        = bool
   default     = false
 }
 
-# variable "tags" {
-#   description = "The Tags attached with the resources"
-#   default = {}
-#   type = any
-# }
+variable "vpc_endpoint_type_ecr_api" {
+  description = "The type of VPC endpoint for ECR api"
+  type        = string
+  default     = "Interface"
+}
 
-# variable "region" {
-#   description = "The AWS region name"
-#   type        = string
-#   default     = null
-# }
+variable "vpc_endpoint_type_ecr_dkr" {
+  description = "The type of VPC endpoint for ECR Docker"
+  type        = string
+  default     = "Interface"
+}
+
+variable "vpc_endpoint_type_private_s3" {
+  description = "The type of VPC endpoint for ECR Docker"
+  type        = string
+  default     = "Gateway"
+}
+
+variable "ipam_address_family" {
+  description = "The address family for the VPC (ipv4 or ipv6)"
+  type        = string
+  default     = "ipv4"
+}
+
+# Define input variables to accept subnet counts
+variable "vpc_public_subnets_counts" {
+  description = "List of counts for public subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_private_subnets_counts" {
+  description = "List of counts for private subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_database_subnets_counts" {
+  description = "List of counts for database subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_intra_subnets_counts" {
+  description = "List of counts for intra subnets"
+  type        = number
+  default     = 1
+}
+
+variable "vpc_default_security_group_ingress" {
+  description = "List of maps of ingress rules to set on the default security group"
+  type        = list(map(string))
+  default     = []
+}
+
+variable "vpc_default_security_group_egress" {
+  description = "List of maps of egress rules to set on the default security group"
+  type        = list(map(string))
+  default     = []
+}
