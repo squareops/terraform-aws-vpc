@@ -188,8 +188,8 @@ module "vpn_server" {
   vpc_id                   = module.vpc.vpc_id
   vpc_cidr                 = var.vpc_cidr
   environment              = var.environment
-  vpn_key_pair             = var.vpn_server_key_pair_name
-  public_subnet            = module.vpc.public_subnets[0]
+  vpn_key_pair_name             = var.vpn_server_key_pair_name
+  public_subnet_ids            = module.vpc.public_subnets[0]
   vpn_server_instance_type = var.vpn_server_instance_type
 }
 
