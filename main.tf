@@ -305,18 +305,27 @@ resource "aws_vpc_endpoint" "private_ecr_api" {
   security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
   vpc_endpoint_type   = var.vpc_endpoint_type_ecr_api
   private_dns_enabled = true
-  policy              = <<POLICY
+
+  policy = <<POLICY
 {
     "Statement": [
         {
-            "Action": "ecr.api",
+            "Sid": "AllowPull",
+            "Principal": {
+                "AWS": "arn:aws:iam::${var.aws_account_id}:role/${module.eks.worker_iam_role_name}"
+            },
+            "Action": [
+                "ecr:BatchGetImage",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:GetAuthorizationToken"
+            ],
             "Effect": "Allow",
-            "Resource": "*",
-            "Principal": "*"
+            "Resource": "*"
         }
     ]
 }
 POLICY
+
   tags = {
     Name = "${var.environment}-${var.name}-ecr-api-endpoint"
   }
