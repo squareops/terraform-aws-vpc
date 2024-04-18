@@ -293,25 +293,7 @@ POLICY
     Name = "${var.environment}-${var.name}-ecr-dkr-endpoint"
   }
 }
-data "aws_iam_policy_document" "private_ecr_api" {
-  statement {
-    effect    = "Deny"
-    actions   = ["*"]
-    resources = ["*"]
 
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-
-    condition {
-      test     = "StringNotEquals"
-      variable = "aws:SourceVpc"
-
-      values = [module.vpc.vpc_id]
-    }
-  }
-}
 # private links for ECR.api
 
 resource "aws_vpc_endpoint" "private_ecr_api" {
@@ -323,8 +305,23 @@ resource "aws_vpc_endpoint" "private_ecr_api" {
   security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
-  policy              = data.aws_iam_policy_document.private_ecr_api.json
-  
+
+  policy = jsonencode({
+    "Statement": [
+      {
+        "Principal": {
+          "AWS": "arn:aws:iam::${var.aws_account_id}:role/${var.worker_iam_role_name}"
+        },
+        "Action": [
+          "ecr:BatchGetImage",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetAuthorizationToken"
+        ],
+        "Effect": "Allow",
+        "Resource": "*"
+      }
+    ]
+  })
 
   tags = {
     Name = "${var.environment}-${var.name}-ecr-api-endpoint"
