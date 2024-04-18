@@ -293,38 +293,37 @@ POLICY
     Name = "${var.environment}-${var.name}-ecr-dkr-endpoint"
   }
 }
+data "aws_iam_policy_document" "private_ecr_api" {
+  statement {
+    effect    = "Deny"
+    actions   = ["*"]
+    resources = ["*"]
 
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:SourceVpc"
+
+      values = [module.vpc.vpc_id]
+    }
+  }
+}
 # private links for ECR.api
 
 resource "aws_vpc_endpoint" "private_ecr_api" {
   count               = var.vpc_ecr_endpoint_enabled ? 1 : 0
   depends_on          = [data.aws_route_tables.aws_private_routes]
   vpc_id              = module.vpc.vpc_id
-  subnet_ids          = [module.vpc.private_subnets[count.index]]
-  service_name        = "com.amazonaws.${var.aws_region}.ecr.api"
-  security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
-  vpc_endpoint_type   = var.vpc_endpoint_type_ecr_api
+  subnet_ids          = module.vpc.private_subnets
+  service_name        = "com.amazonaws.${var.region}.ecr.api"
+  vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
-
-  policy = <<POLICY
-{
-    "Statement": [
-        {
-            "Sid": "AllowPull",
-            "Principal": {
-                "AWS": "arn:aws:iam::${var.aws_account_id}:role/${var.worker_iam_role_name}"
-            },
-            "Action": [
-                "ecr:BatchGetImage",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:GetAuthorizationToken"
-            ],
-            "Effect": "Allow",
-            "Resource": "*"
-        }
-    ]
-}
-POLICY
+  policy              = data.aws_iam_policy_document.private_ecr_api.json
+  
 
   tags = {
     Name = "${var.environment}-${var.name}-ecr-api-endpoint"
