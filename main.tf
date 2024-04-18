@@ -320,6 +320,7 @@ resource "aws_vpc_endpoint" "private_ecr_api" {
   vpc_id              = module.vpc.vpc_id
   subnet_ids          = module.vpc.private_subnets
   service_name        = "com.amazonaws.${var.aws_region}.ecr.api"
+  security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   policy              = data.aws_iam_policy_document.private_ecr_api.json
