@@ -273,7 +273,7 @@ resource "aws_vpc_endpoint" "private_ecr_dkr" {
   depends_on          = [data.aws_route_tables.aws_private_routes]
   vpc_id              = module.vpc.vpc_id
   service_name        = "com.amazonaws.${var.aws_region}.ecr.dkr"
-  subnet_ids          = [module.vpc.private_subnets[count.index]]
+  subnet_ids          = module.vpc.private_subnets
   security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
   vpc_endpoint_type   = var.vpc_endpoint_type_ecr_dkr
   private_dns_enabled = true
