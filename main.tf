@@ -312,7 +312,7 @@ resource "aws_vpc_endpoint" "private_ecr_api" {
         {
             "Sid": "AllowPull",
             "Principal": {
-                "AWS": "arn:aws:iam::${var.aws_account_id}:role/${module.eks.worker_iam_role_name}"
+                "AWS": "arn:aws:iam::${var.aws_account_id}:role/${var.worker_iam_role_name}"
             },
             "Action": [
                 "ecr:BatchGetImage",
