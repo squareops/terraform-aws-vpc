@@ -402,3 +402,8 @@ variable "vpc_default_security_group_egress" {
   type        = list(map(string))
   default     = []
 }
+
+variable "worker_iam_role_name" {
+  description = "Name of the worker IAM role"
+  default     = ""
+}
