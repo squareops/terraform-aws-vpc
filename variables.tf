@@ -26,7 +26,6 @@ variable "name" {
   description = "Specify the name of the VPC"
   type        = string
   default     = ""
-
 }
 
 variable "vpc_cidr" {
@@ -37,10 +36,13 @@ variable "vpc_cidr" {
 
 variable "vpc_availability_zones" {
   description = "Number of Availability Zone to be used by VPC Subnets."
+variable "vpc_availability_zones" {
+  description = "Number of Availability Zone to be used by VPC Subnets."
   default     = []
   type        = list(any)
 }
 
+variable "vpc_public_subnet_enabled" {
 variable "vpc_public_subnet_enabled" {
   description = "Set true to enable public subnets"
   default     = false
@@ -48,17 +50,20 @@ variable "vpc_public_subnet_enabled" {
 }
 
 variable "vpc_public_subnet_cidrs" {
+variable "vpc_public_subnet_cidrs" {
   description = "A list of public subnets CIDR to be created inside the VPC"
   default     = []
   type        = list(any)
 }
 
 variable "vpc_private_subnet_enabled" {
+variable "vpc_private_subnet_enabled" {
   description = "Set true to enable private subnets"
   default     = false
   type        = bool
 }
 
+variable "vpc_private_subnet_cidrs" {
 variable "vpc_private_subnet_cidrs" {
   description = "A list of private subnets CIDR to be created inside the VPC"
   default     = []
@@ -78,11 +83,13 @@ variable "vpc_database_subnet_cidrs" {
 }
 
 variable "vpc_intra_subnet_enabled" {
+variable "vpc_intra_subnet_enabled" {
   description = "Set true to enable intra subnets"
   default     = false
   type        = bool
 }
 
+variable "vpc_intra_subnet_cidrs" {
 variable "vpc_intra_subnet_cidrs" {
   description = "A list of intra subnets CIDR to be created"
   default     = []
@@ -148,11 +155,13 @@ variable "default_network_acl_ingress" {
 }
 
 variable "vpc_one_nat_gateway_per_az" {
+variable "vpc_one_nat_gateway_per_az" {
   description = "Set to true if a NAT Gateway is required per availability zone for Private Subnet Tier"
   default     = false
   type        = bool
 }
 
+variable "vpc_flow_log_enabled" {
 variable "vpc_flow_log_enabled" {
   description = "Whether or not to enable VPC Flow Logs"
   type        = bool
@@ -160,11 +169,13 @@ variable "vpc_flow_log_enabled" {
 }
 
 variable "vpc_flow_log_cloudwatch_log_group_retention_in_days" {
+variable "vpc_flow_log_cloudwatch_log_group_retention_in_days" {
   description = "Specifies the number of days you want to retain log events in the specified log group for VPC flow logs."
   type        = number
   default     = null
 }
 
+variable "vpc_flow_log_max_aggregation_interval" {
 variable "vpc_flow_log_max_aggregation_interval" {
   description = "The maximum interval of time during which a flow of packets is captured and aggregated into a flow log record. Valid Values: `60` seconds or `600` seconds."
   type        = number
@@ -176,7 +187,6 @@ variable "auto_assign_public_ip" {
   type        = bool
   default     = false
 }
-
 
 variable "ipv6_enabled" {
   description = "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or the size of the CIDR block."
@@ -196,13 +206,11 @@ variable "public_subnet_assign_ipv6_address_on_creation" {
   default     = null
 }
 
-
 variable "database_subnet_assign_ipv6_address_on_creation" {
   description = "Assign IPv6 address on database subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map_public_ip_on_launch"
   type        = bool
   default     = null
 }
-
 
 variable "intra_subnet_assign_ipv6_address_on_creation" {
   description = "Assign IPv6 address on intra subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map_public_ip_on_launch"
@@ -234,6 +242,7 @@ variable "secondry_cidr_enabled" {
   type        = bool
 }
 
+variable "database_subnet_group_enabled" {
 variable "database_subnet_group_enabled" {
   description = "Whether create database subnet groups"
   default     = false
@@ -270,6 +279,7 @@ variable "existing_ipam_managed_cidr" {
   type        = string
 }
 
+variable "vpc_flow_log_cloudwatch_log_group_skip_destroy" {
 variable "vpc_flow_log_cloudwatch_log_group_skip_destroy" {
   description = " Set to true if you do not wish the log group (and any logs it may contain) to be deleted at destroy time, and instead just remove the log group from the Terraform state"
   type        = bool
