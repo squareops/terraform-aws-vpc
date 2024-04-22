@@ -38,7 +38,6 @@ variable "name" {
   description = "Specify the name of the VPC"
   type        = string
   default     = ""
-
 }
 
 variable "vpc_cidr" {
@@ -189,7 +188,6 @@ variable "auto_assign_public_ip" {
   default     = false
 }
 
-
 variable "ipv6_enabled" {
   description = "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or the size of the CIDR block."
   type        = bool
@@ -208,13 +206,11 @@ variable "public_subnet_assign_ipv6_address_on_creation" {
   default     = null
 }
 
-
 variable "database_subnet_assign_ipv6_address_on_creation" {
   description = "Assign IPv6 address on database subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map_public_ip_on_launch"
   type        = bool
   default     = null
 }
-
 
 variable "intra_subnet_assign_ipv6_address_on_creation" {
   description = "Assign IPv6 address on intra subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map_public_ip_on_launch"
