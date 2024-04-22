@@ -1,8 +1,3 @@
-output "region" {
-  description = "AWS Region"
-  value       = local.region
-}
-
 output "vpc_id" {
   description = "The ID of the VPC"
   value       = module.vpc.vpc_id
@@ -13,14 +8,14 @@ output "vpc_cidr_block" {
   value       = module.vpc.vpc_cidr_block
 }
 
-output "public_subnets" {
+output "vpc_public_subnets" {
   description = "List of IDs of public subnets"
-  value       = module.vpc.public_subnets
+  value       = module.vpc.vpc_public_subnets
 }
 
-output "private_subnets" {
+output "vpc_private_subnets" {
   description = "List of IDs of private subnets"
-  value       = module.vpc.private_subnets
+  value       = module.vpc.vpc_private_subnets
 }
 
 output "database_subnets" {
@@ -28,9 +23,9 @@ output "database_subnets" {
   value       = module.vpc.database_subnets
 }
 
-output "intra_subnets" {
+output "vpc_intra_subnets" {
   description = "List of IDs of Intra subnets"
-  value       = module.vpc.intra_subnets
+  value       = module.vpc.vpc_intra_subnets
 }
 
 output "vpn_host_public_ip" {
