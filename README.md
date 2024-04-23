@@ -1,13 +1,12 @@
 # AWS Network Terraform module
 
 ![squareops_avatar]
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://squareops.com/wp-content/uploads/2020/05/Squareops-png-white.png1_.png">
   <source media="(prefers-color-scheme: light)" srcset="https://squareops.com/wp-content/uploads/2021/09/Squareops-svg-1.png">
-<img alt="Shows an illustrated sun in light mode and a moon with stars in dark mode." src="https://squareops.com/wp-content/uploads/2021/09/Squareops-svg-1.png">
+  <img src="https://squareops.com/wp-content/uploads/2021/09/Squareops-svg-1.png">
 </picture>
-
-# [squareops_avatar]: https://squareops.com/wp-content/uploads/2022/12/squareops-logo.png
 
 ### [SquareOps Technologies](https://squareops.com/) Your DevOps Partner for Accelerating cloud journey.
 
