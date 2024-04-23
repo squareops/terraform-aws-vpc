@@ -304,18 +304,23 @@ resource "aws_vpc_endpoint" "private_ecr_api" {
   service_name        = "com.amazonaws.${var.aws_region}.ecr.api"
   vpc_endpoint_type   = var.vpc_endpoint_type_ecr_api
   private_dns_enabled = true
-  policy              = <<POLICY
-{
-    "Statement": [
-        {
-            "Action": "ecr.api",
-            "Effect": "Allow",
-            "Resource": "*",
-            "Principal": "*"
-        }
+  policy = jsonencode({
+    "Statement" : [
+      {
+        "Principal" : {
+          "AWS" : "*"
+        },
+        "Action" : [
+          "ecr:BatchGetImage",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetAuthorizationToken"
+        ],
+        "Effect" : "Allow",
+        "Resource" : "*"
+      }
     ]
-}
-POLICY
+  })
+
   tags = {
     Name = "${var.environment}-${var.name}-ecr-api-endpoint"
   }
