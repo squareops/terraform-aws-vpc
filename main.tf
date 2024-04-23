@@ -305,14 +305,13 @@ resource "aws_vpc_endpoint" "private_ecr_api" {
   security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
-
   policy = jsonencode({
-    "Statement": [
+    "Statement" : [
       {
-        "Principal": {
-          "AWS": "arn:aws:iam::${var.aws_account_id}:role/${var.worker_iam_role_name}"
+        "Principal" : {
+          "AWS" : "*"
         },
-        "Action": [
+        "Action" : [
           "ecr:BatchGetImage",
           "ecr:GetDownloadUrlForLayer",
           "ecr:GetAuthorizationToken"
