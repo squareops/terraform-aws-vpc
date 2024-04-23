@@ -1,7 +1,5 @@
 # AWS Network Terraform module
 
-![squareops_avatar]
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://squareops.com/wp-content/uploads/2020/05/Squareops-png-white.png1-3.png">
   <source media="(prefers-color-scheme: light)" srcset="https://squareops.com/wp-content/uploads/2021/09/Squareops-png-1-1.png">
