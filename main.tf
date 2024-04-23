@@ -70,7 +70,7 @@ module "vpc" {
   version                                         = "5.2.0"
   name                                            = format("%s-%s-vpc", var.environment, var.name)
   cidr                                            = var.vpc_cidr # CIDR FOR VPC
-  azs                                             = [for n in range(0, local.azs) : data.aws_availability_zones.available.names[n]]
+  azs                                             = var.vpc_availability_zones
   use_ipam_pool                                   = var.ipam_enabled ? true : false
   ipv4_ipam_pool_id                               = var.ipam_enabled && var.ipam_pool_enabled ? aws_vpc_ipam_pool.ipam_pool[0].id : null
   ipv4_netmask_length                             = var.ipam_enabled ? var.ipv4_netmask_length : null
@@ -188,8 +188,8 @@ module "vpn_server" {
   vpc_id                   = module.vpc.vpc_id
   vpc_cidr                 = var.vpc_cidr
   environment              = var.environment
-  vpn_key_pair             = var.vpn_server_key_pair_name
-  public_subnet            = module.vpc.public_subnets[0]
+  vpn_key_pair_name             = var.vpn_server_key_pair_name
+  public_subnet_ids            = module.vpc.public_subnets[0]
   vpn_server_instance_type = var.vpn_server_instance_type
 }
 
@@ -273,7 +273,7 @@ resource "aws_vpc_endpoint" "private_ecr_dkr" {
   depends_on          = [data.aws_route_tables.aws_private_routes]
   vpc_id              = module.vpc.vpc_id
   service_name        = "com.amazonaws.${var.aws_region}.ecr.dkr"
-  subnet_ids          = [module.vpc.private_subnets[count.index]]
+  subnet_ids          = module.vpc.private_subnets
   security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
   vpc_endpoint_type   = var.vpc_endpoint_type_ecr_dkr
   private_dns_enabled = true
@@ -300,9 +300,10 @@ resource "aws_vpc_endpoint" "private_ecr_api" {
   count               = var.vpc_ecr_endpoint_enabled ? 1 : 0
   depends_on          = [data.aws_route_tables.aws_private_routes]
   vpc_id              = module.vpc.vpc_id
-  subnet_ids          = [module.vpc.private_subnets[count.index]]
+  subnet_ids          = module.vpc.private_subnets
   service_name        = "com.amazonaws.${var.aws_region}.ecr.api"
-  vpc_endpoint_type   = var.vpc_endpoint_type_ecr_api
+  security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
+  vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   policy = jsonencode({
     "Statement" : [
@@ -315,8 +316,8 @@ resource "aws_vpc_endpoint" "private_ecr_api" {
           "ecr:GetDownloadUrlForLayer",
           "ecr:GetAuthorizationToken"
         ],
-        "Effect" : "Allow",
-        "Resource" : "*"
+        "Effect": "Allow",
+        "Resource": "*"
       }
     ]
   })

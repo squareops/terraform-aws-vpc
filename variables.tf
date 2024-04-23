@@ -1,7 +1,19 @@
+
 variable "additional_aws_tags" {
   description = "Additional tags to be applied to AWS resources"
   type        = map(string)
   default     = {}
+}
+
+variable "additional_tags" {
+  description = "Additional tags to be applied to AWS resources"
+  type        = map(string)
+  default = {
+    Owner      = "organization_name"
+    Expires    = "Never"
+    Department = "Engineering"
+  }
+
 }
 
 variable "aws_region" {
@@ -385,4 +397,9 @@ variable "vpc_default_security_group_egress" {
   description = "List of maps of egress rules to set on the default security group"
   type        = list(map(string))
   default     = []
+}
+
+variable "worker_iam_role_name" {
+  description = "Name of the worker IAM role"
+  default     = ""
 }

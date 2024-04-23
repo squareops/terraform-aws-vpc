@@ -1,22 +1,22 @@
-variable "vpc_peering_accepter_vpc_id" {
+variable "vpc_peering_accepter_id" {
   type        = string
   description = "Specify the unique identifier of the VPC that will act as the Acceptor in the VPC peering connection."
   default     = ""
 }
 
-variable "vpc_peering_accepter_vpc_region" {
+variable "vpc_peering_accepter_region" {
   type        = string
   description = "Provide the AWS region where the Acceptor VPC is located. This helps in identifying the correct region for establishing the VPC peering connection."
   default     = ""
 }
 
-variable "vpc_peering_requester_vpc_id" {
+variable "vpc_peering_requester_id" {
   type        = string
   description = "Specify the unique identifier of the VPC that will act as the Reqester in the VPC peering connection."
   default     = ""
 }
 
-variable "vpc_peering_requester_vpc_region" {
+variable "vpc_peering_requester_region" {
   type        = string
   description = "Specify the AWS region where the Requester VPC resides. It ensures the correct region is used for setting up the VPC peering."
   default     = ""
