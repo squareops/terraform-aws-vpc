@@ -310,7 +310,7 @@ resource "aws_vpc_endpoint" "private_ecr_api" {
     "Statement": [
       {
         "Principal": {
-          "AWS": "arn:aws:iam::${var.aws_account_id}:role/${var.worker_iam_role_name}"
+          "AWS": "*"
         },
         "Action": [
           "ecr:BatchGetImage",
