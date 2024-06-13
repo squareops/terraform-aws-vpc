@@ -47,6 +47,7 @@ No modules.
 | [aws_vpc_peering_connection.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_peering_connection) | resource |
 | [aws_vpc_peering_connection_accepter.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_peering_connection_accepter) | resource |
 | [aws_vpc_peering_connection_options.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_peering_connection_options) | resource |
+| [aws_caller_identity.accepter](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_route_tables.accepter](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route_tables) | data source |
 | [aws_route_tables.requester](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route_tables) | data source |
 | [aws_vpc.accepter](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
@@ -56,13 +57,16 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_accepter_name"></a> [accepter\_name](#input\_accepter\_name) | Assign a meaningful name or label to the VPC Accepter. This aids in distinguishing the Accepter VPC within the VPC peering connection. | `string` | `""` | no |
-| <a name="input_accepter_vpc_id"></a> [accepter\_vpc\_id](#input\_accepter\_vpc\_id) | Specify the unique identifier of the VPC that will act as the Acceptor in the VPC peering connection. | `string` | `""` | no |
-| <a name="input_accepter_vpc_region"></a> [accepter\_vpc\_region](#input\_accepter\_vpc\_region) | Provide the AWS region where the Acceptor VPC is located. This helps in identifying the correct region for establishing the VPC peering connection. | `string` | `""` | no |
-| <a name="input_peering_enabled"></a> [peering\_enabled](#input\_peering\_enabled) | Set this variable to true if you want to create the VPC peering connection. Set it to false if you want to skip the creation process. | `bool` | `true` | no |
-| <a name="input_requester_name"></a> [requester\_name](#input\_requester\_name) | Provide a descriptive name or label for the VPC Requester. This helps identify and differentiate the Requester VPC in the peering connection. | `string` | `""` | no |
-| <a name="input_requester_vpc_id"></a> [requester\_vpc\_id](#input\_requester\_vpc\_id) | Specify the unique identifier of the VPC that will act as the Reqester in the VPC peering connection. | `string` | `""` | no |
-| <a name="input_requester_vpc_region"></a> [requester\_vpc\_region](#input\_requester\_vpc\_region) | Specify the AWS region where the Requester VPC resides. It ensures the correct region is used for setting up the VPC peering. | `string` | `""` | no |
+| <a name="input_vpc_peering_accepter_aws_profile"></a> [vpc\_peering\_accepter\_aws\_profile](#input\_vpc\_peering\_accepter\_aws\_profile) | Provide the AWS profile where the accepter VPC is located. | `string` | `""` | no |
+| <a name="input_vpc_peering_accepter_id"></a> [vpc\_peering\_accepter\_id](#input\_vpc\_peering\_accepter\_id) | Specify the unique identifier of the VPC that will act as the Acceptor in the VPC peering connection. | `string` | `""` | no |
+| <a name="input_vpc_peering_accepter_name"></a> [vpc\_peering\_accepter\_name](#input\_vpc\_peering\_accepter\_name) | Assign a meaningful name or label to the VPC Accepter. This aids in distinguishing the Accepter VPC within the VPC peering connection. | `string` | `""` | no |
+| <a name="input_vpc_peering_accepter_region"></a> [vpc\_peering\_accepter\_region](#input\_vpc\_peering\_accepter\_region) | Provide the AWS region where the Acceptor VPC is located. This helps in identifying the correct region for establishing the VPC peering connection. | `string` | `""` | no |
+| <a name="input_vpc_peering_enabled"></a> [vpc\_peering\_enabled](#input\_vpc\_peering\_enabled) | Set this variable to true if you want to create the VPC peering connection. Set it to false if you want to skip the creation process. | `bool` | `true` | no |
+| <a name="input_vpc_peering_multi_account_enabled"></a> [vpc\_peering\_multi\_account\_enabled](#input\_vpc\_peering\_multi\_account\_enabled) | Set this variable to true if you want to create the VPC peering connection between reagions. Set it to false if you want to skip the creation process. | `bool` | `true` | no |
+| <a name="input_vpc_peering_requester_aws_profile"></a> [vpc\_peering\_requester\_aws\_profile](#input\_vpc\_peering\_requester\_aws\_profile) | Provide the AWS profile where the requester VPC is located. | `string` | `""` | no |
+| <a name="input_vpc_peering_requester_id"></a> [vpc\_peering\_requester\_id](#input\_vpc\_peering\_requester\_id) | Specify the unique identifier of the VPC that will act as the Reqester in the VPC peering connection. | `string` | `""` | no |
+| <a name="input_vpc_peering_requester_name"></a> [vpc\_peering\_requester\_name](#input\_vpc\_peering\_requester\_name) | Provide a descriptive name or label for the VPC Requester. This helps identify and differentiate the Requester VPC in the peering connection. | `string` | `""` | no |
+| <a name="input_vpc_peering_requester_region"></a> [vpc\_peering\_requester\_region](#input\_vpc\_peering\_requester\_region) | Specify the AWS region where the Requester VPC resides. It ensures the correct region is used for setting up the VPC peering. | `string` | `""` | no |
 
 ## Outputs
 
