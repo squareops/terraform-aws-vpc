@@ -29,23 +29,30 @@ module "vpc" {
   ipv6_enabled                                    = true
   create_ipam_pool                                = false
   ipam_enabled                                    = false
-  flow_log_enabled                                = true
-  vpn_key_pair_name                               = module.key_pair_vpn.key_pair_name
-  availability_zones                              = ["us-east-1a", "us-east-1b"]
+  vpc_flow_log_enabled                            = true
+  vpn_server_key_pair_name                        = module.key_pair_vpn.key_pair_name
+  vpc_availability_zones                          = ["us-east-1a", "us-east-1b"]
   vpn_server_enabled                              = false
-  intra_subnet_enabled                            = true
+  vpc_intra_subnet_enabled                        = true
   auto_assign_public_ip                           = true
-  public_subnet_enabled                           = true
-  private_subnet_enabled                          = true
-  one_nat_gateway_per_az                          = true
-  database_subnet_enabled                         = true
+  vpc_public_subnet_enabled                       = true
+  vpc_private_subnet_enable                       = true
+  vpc_one_nat_gateway_per_az                      = true
+  vpc_database_subnet_enabled                     = true
   vpn_server_instance_type                        = "t3a.small"
+  vpc_public_subnets_counts                       = 2
+  vpc_private_subnets_counts                      = 2
+  vpc_database_subnets_counts                     = 2
+  vpc_intra_subnets_counts                        = 2
+  vpc_endpoint_type_private_s3                    = "Gateway"
+  vpc_endpoint_type_ecr_dkr                       = "Interface"
+  vpc_endpoint_type_ecr_api                       = "Interface"
   vpc_s3_endpoint_enabled                         = true
   vpc_ecr_endpoint_enabled                        = true
-  flow_log_max_aggregation_interval               = 60
-  flow_log_cloudwatch_log_group_skip_destroy      = true
-  flow_log_cloudwatch_log_group_retention_in_days = 90
-  flow_log_cloudwatch_log_group_kms_key_arn       = "arn:aws:kms:us-east-2:222222222222:key/kms_key_arn" #Enter your kms key arn
+  vpc_flow_log_max_aggregation_interval           = 60
+  vpc_flow_log_cloudwatch_log_group_skip_destroy  = true
+  vpc_flow_log_cloudwatch_log_group_retention_in_days = 90
+  vpc_flow_log_cloudwatch_log_group_kms_key_arn   = "arn:aws:kms:us-east-2:222222222222:key/kms_key_arn" #Enter your kms key arn
 }
 ```
 Refer [this](https://github.com/squareops/terraform-aws-vpc/tree/main/examples) for more examples.
@@ -191,13 +198,13 @@ In this module, we have implemented the following CIS Compliance checks for VPC:
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.23 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.23 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0.0 |
 
 ## Modules
 
@@ -211,9 +218,9 @@ In this module, we have implemented the following CIS Compliance checks for VPC:
 | Name | Type |
 |------|------|
 | [aws_security_group.vpc_endpoints](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_vpc_endpoint.private-ecr-api](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
-| [aws_vpc_endpoint.private-ecr-dkr](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
-| [aws_vpc_endpoint.private-s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
+| [aws_vpc_endpoint.private_ecr_api](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
+| [aws_vpc_endpoint.private_ecr_dkr](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
+| [aws_vpc_endpoint.private_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
 | [aws_vpc_ipam.ipam](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipam) | resource |
 | [aws_vpc_ipam_pool.ipam_pool](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipam_pool) | resource |
 | [aws_vpc_ipam_pool_cidr.ipam_pool_cidr](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipam_pool_cidr) | resource |
@@ -225,61 +232,77 @@ In this module, we have implemented the following CIS Compliance checks for VPC:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_additional_aws_tags"></a> [additional\_aws\_tags](#input\_additional\_aws\_tags) | Additional tags to be applied to AWS resources | `map(string)` | `{}` | no |
 | <a name="input_auto_assign_public_ip"></a> [auto\_assign\_public\_ip](#input\_auto\_assign\_public\_ip) | Specify true to indicate that instances launched into the subnet should be assigned a public IP address. | `bool` | `false` | no |
-| <a name="input_availability_zones"></a> [availability\_zones](#input\_availability\_zones) | Number of Availability Zone to be used by VPC Subnets | `list(any)` | `[]` | no |
-| <a name="input_create_ipam_pool"></a> [create\_ipam\_pool](#input\_create\_ipam\_pool) | Whether create new IPAM pool | `bool` | `true` | no |
+| <a name="input_aws_account_id"></a> [aws\_account\_id](#input\_aws\_account\_id) | Account ID of the AWS Account. | `string` | `"1234567890"` | no |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | Name of the AWS region where VPC  is to be created. | `string` | `""` | no |
+| <a name="input_database_nat_gateway_route_enabled"></a> [database\_nat\_gateway\_route\_enabled](#input\_database\_nat\_gateway\_route\_enabled) | Nat Gateway route to be created for internet access to database subnets | `bool` | `false` | no |
 | <a name="input_database_subnet_assign_ipv6_address_on_creation"></a> [database\_subnet\_assign\_ipv6\_address\_on\_creation](#input\_database\_subnet\_assign\_ipv6\_address\_on\_creation) | Assign IPv6 address on database subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map\_public\_ip\_on\_launch | `bool` | `null` | no |
-| <a name="input_database_subnet_cidrs"></a> [database\_subnet\_cidrs](#input\_database\_subnet\_cidrs) | Database Tier subnet CIDRs to be created | `list(any)` | `[]` | no |
-| <a name="input_database_subnet_enabled"></a> [database\_subnet\_enabled](#input\_database\_subnet\_enabled) | Set true to enable database subnets | `bool` | `false` | no |
+| <a name="input_database_subnet_group_enabled"></a> [database\_subnet\_group\_enabled](#input\_database\_subnet\_group\_enabled) | Whether create database subnet groups | `bool` | `false` | no |
 | <a name="input_default_network_acl_ingress"></a> [default\_network\_acl\_ingress](#input\_default\_network\_acl\_ingress) | List of maps of ingress rules to set on the Default Network ACL | `list(map(string))` | <pre>[<br>  {<br>    "action": "deny",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 22,<br>    "protocol": "tcp",<br>    "rule_no": 98,<br>    "to_port": 22<br>  },<br>  {<br>    "action": "deny",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 3389,<br>    "protocol": "tcp",<br>    "rule_no": 99,<br>    "to_port": 3389<br>  },<br>  {<br>    "action": "allow",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_no": 100,<br>    "to_port": 0<br>  },<br>  {<br>    "action": "allow",<br>    "from_port": 0,<br>    "ipv6_cidr_block": "::/0",<br>    "protocol": "-1",<br>    "rule_no": 101,<br>    "to_port": 0<br>  }<br>]</pre> | no |
-| <a name="input_enable_database_subnet_group"></a> [enable\_database\_subnet\_group](#input\_enable\_database\_subnet\_group) | Whether create database subnet groups | `bool` | `false` | no |
+| <a name="input_dns_hostnames_enabled"></a> [dns\_hostnames\_enabled](#input\_dns\_hostnames\_enabled) | Whether to enable DNS hostnames | `bool` | `true` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Specify the environment indentifier for the VPC | `string` | `""` | no |
 | <a name="input_existing_ipam_managed_cidr"></a> [existing\_ipam\_managed\_cidr](#input\_existing\_ipam\_managed\_cidr) | The existing IPAM pool CIDR | `string` | `""` | no |
-| <a name="input_flow_log_cloudwatch_log_group_kms_key_arn"></a> [flow\_log\_cloudwatch\_log\_group\_kms\_key\_arn](#input\_flow\_log\_cloudwatch\_log\_group\_kms\_key\_arn) | The ARN of the KMS Key to use when encrypting log data for VPC flow logs | `string` | `null` | no |
-| <a name="input_flow_log_cloudwatch_log_group_retention_in_days"></a> [flow\_log\_cloudwatch\_log\_group\_retention\_in\_days](#input\_flow\_log\_cloudwatch\_log\_group\_retention\_in\_days) | Specifies the number of days you want to retain log events in the specified log group for VPC flow logs. | `number` | `null` | no |
-| <a name="input_flow_log_cloudwatch_log_group_skip_destroy"></a> [flow\_log\_cloudwatch\_log\_group\_skip\_destroy](#input\_flow\_log\_cloudwatch\_log\_group\_skip\_destroy) | Set to true if you do not wish the log group (and any logs it may contain) to be deleted at destroy time, and instead just remove the log group from the Terraform state | `bool` | `false` | no |
-| <a name="input_flow_log_enabled"></a> [flow\_log\_enabled](#input\_flow\_log\_enabled) | Whether or not to enable VPC Flow Logs | `bool` | `false` | no |
-| <a name="input_flow_log_max_aggregation_interval"></a> [flow\_log\_max\_aggregation\_interval](#input\_flow\_log\_max\_aggregation\_interval) | The maximum interval of time during which a flow of packets is captured and aggregated into a flow log record. Valid Values: `60` seconds or `600` seconds. | `number` | `60` | no |
 | <a name="input_intra_subnet_assign_ipv6_address_on_creation"></a> [intra\_subnet\_assign\_ipv6\_address\_on\_creation](#input\_intra\_subnet\_assign\_ipv6\_address\_on\_creation) | Assign IPv6 address on intra subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map\_public\_ip\_on\_launch | `bool` | `null` | no |
-| <a name="input_intra_subnet_cidrs"></a> [intra\_subnet\_cidrs](#input\_intra\_subnet\_cidrs) | A list of intra subnets CIDR to be created | `list(any)` | `[]` | no |
-| <a name="input_intra_subnet_enabled"></a> [intra\_subnet\_enabled](#input\_intra\_subnet\_enabled) | Set true to enable intra subnets | `bool` | `false` | no |
+| <a name="input_ipam_address_family"></a> [ipam\_address\_family](#input\_ipam\_address\_family) | The address family for the VPC (ipv4 or ipv6) | `string` | `"ipv4"` | no |
 | <a name="input_ipam_enabled"></a> [ipam\_enabled](#input\_ipam\_enabled) | Whether enable IPAM managed VPC or not | `bool` | `false` | no |
+| <a name="input_ipam_pool_enabled"></a> [ipam\_pool\_enabled](#input\_ipam\_pool\_enabled) | Whether create new IPAM pool | `bool` | `true` | no |
 | <a name="input_ipam_pool_id"></a> [ipam\_pool\_id](#input\_ipam\_pool\_id) | The existing IPAM pool id if any | `string` | `null` | no |
 | <a name="input_ipv4_netmask_length"></a> [ipv4\_netmask\_length](#input\_ipv4\_netmask\_length) | The netmask length for IPAM managed VPC | `number` | `16` | no |
 | <a name="input_ipv6_enabled"></a> [ipv6\_enabled](#input\_ipv6\_enabled) | Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or the size of the CIDR block. | `bool` | `false` | no |
 | <a name="input_ipv6_only"></a> [ipv6\_only](#input\_ipv6\_only) | Enable it for deploying native IPv6 network | `bool` | `false` | no |
+| <a name="input_manage_vpc_default_security_group"></a> [manage\_vpc\_default\_security\_group](#input\_manage\_vpc\_default\_security\_group) | Should be true to manage Default Security group of vpc | `bool` | `true` | no |
 | <a name="input_name"></a> [name](#input\_name) | Specify the name of the VPC | `string` | `""` | no |
-| <a name="input_one_nat_gateway_per_az"></a> [one\_nat\_gateway\_per\_az](#input\_one\_nat\_gateway\_per\_az) | Set to true if a NAT Gateway is required per availability zone for Private Subnet Tier | `bool` | `false` | no |
 | <a name="input_private_subnet_assign_ipv6_address_on_creation"></a> [private\_subnet\_assign\_ipv6\_address\_on\_creation](#input\_private\_subnet\_assign\_ipv6\_address\_on\_creation) | Assign IPv6 address on private subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map\_public\_ip\_on\_launch | `bool` | `null` | no |
-| <a name="input_private_subnet_cidrs"></a> [private\_subnet\_cidrs](#input\_private\_subnet\_cidrs) | A list of private subnets CIDR to be created inside the VPC | `list(any)` | `[]` | no |
-| <a name="input_private_subnet_enabled"></a> [private\_subnet\_enabled](#input\_private\_subnet\_enabled) | Set true to enable private subnets | `bool` | `false` | no |
 | <a name="input_public_subnet_assign_ipv6_address_on_creation"></a> [public\_subnet\_assign\_ipv6\_address\_on\_creation](#input\_public\_subnet\_assign\_ipv6\_address\_on\_creation) | Assign IPv6 address on public subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map\_public\_ip\_on\_launch | `bool` | `null` | no |
-| <a name="input_public_subnet_cidrs"></a> [public\_subnet\_cidrs](#input\_public\_subnet\_cidrs) | A list of public subnets CIDR to be created inside the VPC | `list(any)` | `[]` | no |
-| <a name="input_public_subnet_enabled"></a> [public\_subnet\_enabled](#input\_public\_subnet\_enabled) | Set true to enable public subnets | `bool` | `false` | no |
-| <a name="input_region"></a> [region](#input\_region) | The AWS region name | `string` | `null` | no |
 | <a name="input_secondary_cidr_blocks"></a> [secondary\_cidr\_blocks](#input\_secondary\_cidr\_blocks) | List of the secondary CIDR blocks which can be at most 5 | `list(string)` | `[]` | no |
 | <a name="input_secondry_cidr_enabled"></a> [secondry\_cidr\_enabled](#input\_secondry\_cidr\_enabled) | Whether enable secondary CIDR with VPC | `bool` | `false` | no |
+| <a name="input_vpc_availability_zones"></a> [vpc\_availability\_zones](#input\_vpc\_availability\_zones) | Number of Availability Zone to be used by VPC Subnets. | `list(any)` | `[]` | no |
 | <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | The CIDR block of the VPC | `string` | `"10.0.0.0/16"` | no |
+| <a name="input_vpc_database_subnet_cidrs"></a> [vpc\_database\_subnet\_cidrs](#input\_vpc\_database\_subnet\_cidrs) | Database Tier subnet CIDRs to be created | `list(any)` | `[]` | no |
+| <a name="input_vpc_database_subnet_enabled"></a> [vpc\_database\_subnet\_enabled](#input\_vpc\_database\_subnet\_enabled) | Set true to enable database subnets | `bool` | `false` | no |
+| <a name="input_vpc_database_subnets_counts"></a> [vpc\_database\_subnets\_counts](#input\_vpc\_database\_subnets\_counts) | List of counts for database subnets | `number` | `1` | no |
+| <a name="input_vpc_default_security_group_egress"></a> [vpc\_default\_security\_group\_egress](#input\_vpc\_default\_security\_group\_egress) | List of maps of egress rules to set on the default security group | `list(map(string))` | `[]` | no |
+| <a name="input_vpc_default_security_group_ingress"></a> [vpc\_default\_security\_group\_ingress](#input\_vpc\_default\_security\_group\_ingress) | List of maps of ingress rules to set on the default security group | `list(map(string))` | `[]` | no |
 | <a name="input_vpc_ecr_endpoint_enabled"></a> [vpc\_ecr\_endpoint\_enabled](#input\_vpc\_ecr\_endpoint\_enabled) | Set to true if you want to enable vpc ecr endpoints | `bool` | `false` | no |
+| <a name="input_vpc_endpoint_type_ecr_api"></a> [vpc\_endpoint\_type\_ecr\_api](#input\_vpc\_endpoint\_type\_ecr\_api) | The type of VPC endpoint for ECR api | `string` | `"Interface"` | no |
+| <a name="input_vpc_endpoint_type_ecr_dkr"></a> [vpc\_endpoint\_type\_ecr\_dkr](#input\_vpc\_endpoint\_type\_ecr\_dkr) | The type of VPC endpoint for ECR Docker | `string` | `"Interface"` | no |
+| <a name="input_vpc_endpoint_type_private_s3"></a> [vpc\_endpoint\_type\_private\_s3](#input\_vpc\_endpoint\_type\_private\_s3) | The type of VPC endpoint for ECR Docker | `string` | `"Gateway"` | no |
+| <a name="input_vpc_flow_log_cloudwatch_log_group_kms_key_arn"></a> [vpc\_flow\_log\_cloudwatch\_log\_group\_kms\_key\_arn](#input\_vpc\_flow\_log\_cloudwatch\_log\_group\_kms\_key\_arn) | The ARN of the KMS Key to use when encrypting log data for VPC flow logs | `string` | `null` | no |
+| <a name="input_vpc_flow_log_cloudwatch_log_group_retention_in_days"></a> [vpc\_flow\_log\_cloudwatch\_log\_group\_retention\_in\_days](#input\_vpc\_flow\_log\_cloudwatch\_log\_group\_retention\_in\_days) | Specifies the number of days you want to retain log events in the specified log group for VPC flow logs. | `number` | `null` | no |
+| <a name="input_vpc_flow_log_cloudwatch_log_group_skip_destroy"></a> [vpc\_flow\_log\_cloudwatch\_log\_group\_skip\_destroy](#input\_vpc\_flow\_log\_cloudwatch\_log\_group\_skip\_destroy) | Set to true if you do not wish the log group (and any logs it may contain) to be deleted at destroy time, and instead just remove the log group from the Terraform state | `bool` | `false` | no |
+| <a name="input_vpc_flow_log_destination_type"></a> [vpc\_flow\_log\_destination\_type](#input\_vpc\_flow\_log\_destination\_type) | Type of flow log destination. Can be s3 or cloud-watch-logs | `string` | `"cloud-watch-logs"` | no |
+| <a name="input_vpc_flow_log_enabled"></a> [vpc\_flow\_log\_enabled](#input\_vpc\_flow\_log\_enabled) | Whether or not to enable VPC Flow Logs | `bool` | `false` | no |
+| <a name="input_vpc_flow_log_max_aggregation_interval"></a> [vpc\_flow\_log\_max\_aggregation\_interval](#input\_vpc\_flow\_log\_max\_aggregation\_interval) | The maximum interval of time during which a flow of packets is captured and aggregated into a flow log record. Valid Values: `60` seconds or `600` seconds. | `number` | `60` | no |
+| <a name="input_vpc_flow_log_traffic_type"></a> [vpc\_flow\_log\_traffic\_type](#input\_vpc\_flow\_log\_traffic\_type) | The type of traffic to capture. Valid values: ACCEPT, REJECT, ALL | `string` | `"ALL"` | no |
+| <a name="input_vpc_intra_subnet_cidrs"></a> [vpc\_intra\_subnet\_cidrs](#input\_vpc\_intra\_subnet\_cidrs) | A list of intra subnets CIDR to be created | `list(any)` | `[]` | no |
+| <a name="input_vpc_intra_subnet_enabled"></a> [vpc\_intra\_subnet\_enabled](#input\_vpc\_intra\_subnet\_enabled) | Set true to enable intra subnets | `bool` | `false` | no |
+| <a name="input_vpc_intra_subnets_counts"></a> [vpc\_intra\_subnets\_counts](#input\_vpc\_intra\_subnets\_counts) | List of counts for intra subnets | `number` | `1` | no |
+| <a name="input_vpc_manage_default_network_acl"></a> [vpc\_manage\_default\_network\_acl](#input\_vpc\_manage\_default\_network\_acl) | Should be true to manage Default Network ACL | `bool` | `true` | no |
+| <a name="input_vpc_one_nat_gateway_per_az"></a> [vpc\_one\_nat\_gateway\_per\_az](#input\_vpc\_one\_nat\_gateway\_per\_az) | Set to true if a NAT Gateway is required per availability zone for Private Subnet Tier | `bool` | `false` | no |
+| <a name="input_vpc_private_subnet_cidrs"></a> [vpc\_private\_subnet\_cidrs](#input\_vpc\_private\_subnet\_cidrs) | A list of private subnets CIDR to be created inside the VPC | `list(any)` | `[]` | no |
+| <a name="input_vpc_private_subnet_enabled"></a> [vpc\_private\_subnet\_enabled](#input\_vpc\_private\_subnet\_enabled) | Set true to enable private subnets | `bool` | `false` | no |
+| <a name="input_vpc_private_subnets_counts"></a> [vpc\_private\_subnets\_counts](#input\_vpc\_private\_subnets\_counts) | List of counts for private subnets | `number` | `1` | no |
+| <a name="input_vpc_public_subnet_cidrs"></a> [vpc\_public\_subnet\_cidrs](#input\_vpc\_public\_subnet\_cidrs) | A list of public subnets CIDR to be created inside the VPC | `list(any)` | `[]` | no |
+| <a name="input_vpc_public_subnet_enabled"></a> [vpc\_public\_subnet\_enabled](#input\_vpc\_public\_subnet\_enabled) | Set true to enable public subnets | `bool` | `false` | no |
+| <a name="input_vpc_public_subnets_counts"></a> [vpc\_public\_subnets\_counts](#input\_vpc\_public\_subnets\_counts) | List of counts for public subnets | `number` | `1` | no |
 | <a name="input_vpc_s3_endpoint_enabled"></a> [vpc\_s3\_endpoint\_enabled](#input\_vpc\_s3\_endpoint\_enabled) | Set to true if you want to enable vpc S3 endpoints | `bool` | `false` | no |
-| <a name="input_vpn_key_pair_name"></a> [vpn\_key\_pair\_name](#input\_vpn\_key\_pair\_name) | Specify the name of AWS Keypair to be used for VPN Server | `string` | `""` | no |
+| <a name="input_vpn_gateway_enabled"></a> [vpn\_gateway\_enabled](#input\_vpn\_gateway\_enabled) | Whether to enable vpn Gateway | `bool` | `false` | no |
 | <a name="input_vpn_server_enabled"></a> [vpn\_server\_enabled](#input\_vpn\_server\_enabled) | Set to true if you want to deploy VPN Gateway resource and attach it to the VPC | `bool` | `false` | no |
 | <a name="input_vpn_server_instance_type"></a> [vpn\_server\_instance\_type](#input\_vpn\_server\_instance\_type) | EC2 instance Type for VPN Server, Only amd64 based instance type are supported eg. t2.medium, t3.micro, c5a.large etc. | `string` | `"t3a.small"` | no |
+| <a name="input_vpn_server_key_pair_name"></a> [vpn\_server\_key\_pair\_name](#input\_vpn\_server\_key\_pair\_name) | Specify the name of AWS Keypair to be used for VPN Server | `string` | `""` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
 | <a name="output_database_subnets"></a> [database\_subnets](#output\_database\_subnets) | List of IDs of database subnets |
-| <a name="output_intra_subnets"></a> [intra\_subnets](#output\_intra\_subnets) | List of IDs of Intra subnets |
-| <a name="output_ipv6_vpc_cidr_block"></a> [ipv6\_vpc\_cidr\_block](#output\_ipv6\_vpc\_cidr\_block) | The IPv6 CIDR block |
-| <a name="output_private_subnets"></a> [private\_subnets](#output\_private\_subnets) | List of IDs of private subnets |
-| <a name="output_public_subnets"></a> [public\_subnets](#output\_public\_subnets) | List of IDs of public subnets |
-| <a name="output_vpc_cidr_block"></a> [vpc\_cidr\_block](#output\_vpc\_cidr\_block) | IPV4 CIDR Block for this VPC |
+| <a name="output_vpc_cidr_block"></a> [vpc\_cidr\_block](#output\_vpc\_cidr\_block) | AWS Region |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC |
-| <a name="output_vpc_ipv6_association_id"></a> [vpc\_ipv6\_association\_id](#output\_vpc\_ipv6\_association\_id) | The association ID for the IPv6 CIDR block |
-| <a name="output_vpc_secondary_cidr_blocks"></a> [vpc\_secondary\_cidr\_blocks](#output\_vpc\_secondary\_cidr\_blocks) | List of secondary CIDR blocks of the VPC |
-| <a name="output_vpn_host_public_ip"></a> [vpn\_host\_public\_ip](#output\_vpn\_host\_public\_ip) | IP Address of VPN Server |
+| <a name="output_vpc_intra_subnets"></a> [vpc\_intra\_subnets](#output\_vpc\_intra\_subnets) | List of IDs of Intra subnets |
+| <a name="output_vpc_private_subnets"></a> [vpc\_private\_subnets](#output\_vpc\_private\_subnets) | List of IDs of private subnets |
+| <a name="output_vpc_public_subnets"></a> [vpc\_public\_subnets](#output\_vpc\_public\_subnets) | List of IDs of public subnets |
+| <a name="output_vpn_host_public_ip"></a> [vpn\_host\_public\_ip](#output\_vpn\_host\_public\_ip) | IP Adress of VPN Server |
 | <a name="output_vpn_security_group"></a> [vpn\_security\_group](#output\_vpn\_security\_group) | Security Group ID of VPN Server |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
