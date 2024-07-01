@@ -1,11 +1,13 @@
+# Allocate an Elastic IP (EIP) in the VPC
 resource "aws_eip" "vpn" {
   domain   = "vpc"
   instance = module.vpn_server.id
 }
 
+# Security group created for VPN server EC2 instance
 module "security_group_vpn" {
   source      = "terraform-aws-modules/security-group/aws"
-  version     = "4.13.0"
+  version     = "5.1.2"
   create      = true
   name        = format("%s-%s-%s", var.environment, var.name, "vpn-sg")
   description = "vpn server security group"
@@ -59,7 +61,8 @@ module "security_group_vpn" {
   )
 }
 
-data "aws_ami" "ubuntu_20_ami" {
+# Data block for selecting AMI for VPN server
+data "aws_ami" "ubuntu_22_ami" {
   owners      = ["099720109477"]
   most_recent = true
 
@@ -74,18 +77,20 @@ data "aws_ami" "ubuntu_20_ami" {
   }
 }
 
-
+# Linux script to install pritunl vpn service.
 data "template_file" "pritunl" {
   template = file("${path.module}/scripts/pritunl-vpn.sh")
 }
 
+# Get the current AWS Region
 data "aws_region" "current" {}
 
+# Module block for calling AWS module to create a VPN server.
 module "vpn_server" {
   source                      = "terraform-aws-modules/ec2-instance/aws"
-  version                     = "4.1.4"
+  version                     = "5.6.1"
   name                        = format("%s-%s-%s", var.environment, var.name, "vpn-ec2-instance")
-  ami                         = data.aws_ami.ubuntu_20_ami.image_id
+  ami                         = data.aws_ami.ubuntu_22_ami.image_id
   instance_type               = var.vpn_server_instance_type
   subnet_id                   = var.public_subnet
   key_name                    = var.vpn_key_pair
@@ -98,7 +103,7 @@ module "vpn_server" {
   root_block_device = [
     {
       encrypted   = true
-      volume_type = "gp2"
+      volume_type = "gp3"
       volume_size = 20
     }
   ]
@@ -111,6 +116,7 @@ module "vpn_server" {
   )
 }
 
+# Define an IAM role for the VPN EC2 instance
 resource "aws_iam_role" "vpn_role" {
   name               = format("%s-%s-%s", var.environment, var.name, "vpnEC2InstanceRole")
   assume_role_policy = <<EOF
@@ -132,34 +138,41 @@ resource "aws_iam_role" "vpn_role" {
 EOF
 }
 
+# Data resource to get ARN of SSM policy.
 data "aws_iam_policy" "SSMManagedInstanceCore" {
   arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+# Resource block to attach IAM policy with IAM role.
 resource "aws_iam_role_policy_attachment" "SSMManagedInstanceCore_attachment" {
   role       = join("", aws_iam_role.vpn_role[*].name)
   policy_arn = data.aws_iam_policy.SSMManagedInstanceCore.arn
 }
 
+# Define an IAM instance profile for VPN EC2 instances
 resource "aws_iam_instance_profile" "vpn_SSM" {
   name = format("%s-%s-%s", var.environment, var.name, "vpnEC2InstanceProfile")
   role = join("", aws_iam_role.vpn_role[*].name)
 }
 
+# Define a null_resource to introduce a delay of 3 minutes after module.vpn_server completes
 resource "time_sleep" "wait_3_min" {
   depends_on      = [module.vpn_server]
   create_duration = "3m"
 }
 
+# Get the ARN for secret manager policy.
 data "aws_iam_policy" "SecretsManagerReadWrite" {
   arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
 
+# Attach IAM role policy for Secrets Manager read-write access
 resource "aws_iam_role_policy_attachment" "SecretsManagerReadWrite_attachment" {
   role       = join("", aws_iam_role.vpn_role[*].name)
   policy_arn = data.aws_iam_policy.SecretsManagerReadWrite.arn
 }
 
+# Define an AWS Systems Manager (SSM) association
 resource "aws_ssm_association" "ssm_association" {
   name       = aws_ssm_document.ssm_document.name
   depends_on = [time_sleep.wait_3_min]
@@ -169,6 +182,7 @@ resource "aws_ssm_association" "ssm_association" {
   }
 }
 
+# Define an AWS Systems Manager (SSM) document for creating secrets
 resource "aws_ssm_document" "ssm_document" {
   name          = format("%s-%s-%s", var.environment, var.name, "ssm_document_create_secret")
   depends_on    = [time_sleep.wait_3_min]
@@ -204,6 +218,7 @@ resource "aws_ssm_document" "ssm_document" {
 DOC
 }
 
+# Define a null_resource to execute a local command for deleting a Secrets Manager secret
 resource "null_resource" "delete_secret" {
   triggers = {
     environment = var.environment

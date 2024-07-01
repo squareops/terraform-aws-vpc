@@ -1,3 +1,4 @@
+# Declaration of local variables with values that can be passed in the VPC module
 locals {
   azs                   = length(var.availability_zones)
   public_subnets_native = var.public_subnet_enabled ? length(var.public_subnet_cidrs) > 0 ? var.public_subnet_cidrs : [for netnum in range(0, local.azs) : cidrsubnet(var.vpc_cidr, 8, netnum)] : []
@@ -54,14 +55,18 @@ locals {
   database_subnet_ipv6_prefixes = var.database_subnet_enabled ? [for i in range(local.azs) : i + 2 * length(data.aws_availability_zones.available.names)] : []
   intra_subnet_ipv6_prefixes    = var.intra_subnet_enabled ? [for i in range(local.azs) : i + 3 * length(data.aws_availability_zones.available.names)] : []
 }
+
+# Data source for fetching available AWS availability zones
 data "aws_availability_zones" "available" {}
+# Data source for fetching information about the VPN sever EC2 instance type
 data "aws_ec2_instance_type" "arch" {
   instance_type = var.vpn_server_instance_type
 }
 
+# Module block for creating a VPC using terraform-aws-modules/vpc/aws module
 module "vpc" {
   source                                          = "terraform-aws-modules/vpc/aws"
-  version                                         = "5.2.0"
+  version                                         = "5.8.1"
   name                                            = format("%s-%s-vpc", var.environment, var.name)
   cidr                                            = var.vpc_cidr # CIDR FOR VPC
   azs                                             = var.availability_zones
@@ -138,7 +143,7 @@ module "vpc" {
   })
 
   private_subnet_tags_per_az = { for az in var.availability_zones : az => {
-    "Karpenter"        = "${az}"
+    "Karpenter" = "${az}"
   } }
 
   private_route_table_tags = tomap({
@@ -178,6 +183,7 @@ module "vpc" {
   }
 }
 
+# Module block for creating a VPN server
 module "vpn_server" {
   count                    = var.vpn_server_enabled && local.is_supported_arch ? 1 : 0
   depends_on               = [module.vpc]
@@ -191,6 +197,7 @@ module "vpn_server" {
   vpn_server_instance_type = var.vpn_server_instance_type
 }
 
+# Define an AWS VPC IP Address Management (IPAM) resource
 resource "aws_vpc_ipam" "ipam" {
   count = var.ipam_enabled && var.create_ipam_pool ? 1 : 0
   operating_regions {
@@ -200,7 +207,7 @@ resource "aws_vpc_ipam" "ipam" {
 
 }
 
-# IPv4
+# Define an AWS VPC IP Address Management (IPAM) pool resource
 resource "aws_vpc_ipam_pool" "ipam_pool" {
   count                             = var.ipam_enabled && var.create_ipam_pool ? 1 : 0
   description                       = "IPv4 pool"
@@ -208,18 +215,16 @@ resource "aws_vpc_ipam_pool" "ipam_pool" {
   ipam_scope_id                     = aws_vpc_ipam.ipam[0].private_default_scope_id
   locale                            = var.region
   allocation_default_netmask_length = 16
-
-
 }
 
+# Define an AWS VPC IP Address Management (IPAM) pool CIDR resource
 resource "aws_vpc_ipam_pool_cidr" "ipam_pool_cidr" {
   count        = var.ipam_enabled ? 1 : 0
   ipam_pool_id = var.create_ipam_pool ? aws_vpc_ipam_pool.ipam_pool[0].id : var.ipam_pool_id
   cidr         = var.create_ipam_pool ? var.vpc_cidr : var.existing_ipam_managed_cidr
 }
 
-# private links for S3
-
+# Define a data source to fetch AWS Route Tables for private routes
 data "aws_route_tables" "aws_private_routes" {
   count      = var.vpc_s3_endpoint_enabled ? 1 : 0
   depends_on = [module.vpc]
@@ -229,6 +234,7 @@ data "aws_route_tables" "aws_private_routes" {
   }
 }
 
+# Define an AWS VPC endpoint for S3
 resource "aws_vpc_endpoint" "private-s3" {
   count             = var.vpc_s3_endpoint_enabled ? 1 : 0
   depends_on        = [data.aws_route_tables.aws_private_routes]
@@ -253,7 +259,7 @@ POLICY
   }
 }
 
-# allow 443 to access ecr repo
+# Allow access  to ECR repo at port 443
 resource "aws_security_group" "vpc_endpoints" {
   count       = var.vpc_ecr_endpoint_enabled ? 1 : 0
   name_prefix = "${var.environment}-vpc-endpoints"
@@ -268,8 +274,8 @@ resource "aws_security_group" "vpc_endpoints" {
     cidr_blocks = [var.vpc_cidr]
   }
 }
-# private links for ECR.dkr
 
+# private links for ECR.dkr
 resource "aws_vpc_endpoint" "private-ecr-dkr" {
   count               = var.vpc_ecr_endpoint_enabled ? 1 : 0
   depends_on          = [data.aws_route_tables.aws_private_routes]
