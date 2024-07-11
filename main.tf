@@ -66,7 +66,7 @@ data "aws_ec2_instance_type" "arch" {
 # Module block for creating a VPC using terraform-aws-modules/vpc/aws module
 module "vpc" {
   source                                          = "terraform-aws-modules/vpc/aws"
-  version                                         = "5.8.1"
+  version                                         = "5.9.0"
   name                                            = format("%s-%s-vpc", var.environment, var.name)
   cidr                                            = var.vpc_cidr # CIDR FOR VPC
   azs                                             = var.availability_zones
@@ -195,6 +195,7 @@ module "vpn_server" {
   vpn_key_pair             = var.vpn_key_pair_name
   public_subnet            = module.vpc.public_subnets[0]
   vpn_server_instance_type = var.vpn_server_instance_type
+  kms_key_arn              = var.kms_key_arn
 }
 
 # Define an AWS VPC IP Address Management (IPAM) resource

@@ -88,7 +88,7 @@ data "aws_region" "current" {}
 # Module block for calling AWS module to create a VPN server.
 module "vpn_server" {
   source                      = "terraform-aws-modules/ec2-instance/aws"
-  version                     = "5.6.1"
+  version                     = "5.2.1"
   name                        = format("%s-%s-%s", var.environment, var.name, "vpn-ec2-instance")
   ami                         = data.aws_ami.ubuntu_22_ami.image_id
   instance_type               = var.vpn_server_instance_type
@@ -105,6 +105,7 @@ module "vpn_server" {
       encrypted   = true
       volume_type = "gp3"
       volume_size = 20
+      kms_key_id  = var.kms_key_arn
     }
   ]
 

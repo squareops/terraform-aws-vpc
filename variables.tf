@@ -281,3 +281,9 @@ variable "vpc_ecr_endpoint_enabled" {
   type        = bool
   default     = false
 }
+
+variable "kms_key_arn" {
+  description = "ARN of the KMS key to encrypt VPN server EBS volume"
+  type        = string
+  default     = ""
+}

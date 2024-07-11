@@ -34,7 +34,7 @@ Refer [this](https://pritunl.com/) for more information.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_security_group_vpn"></a> [security\_group\_vpn](#module\_security\_group\_vpn) | terraform-aws-modules/security-group/aws | 5.1.2 |
-| <a name="module_vpn_server"></a> [vpn\_server](#module\_vpn\_server) | terraform-aws-modules/ec2-instance/aws | 5.6.1 |
+| <a name="module_vpn_server"></a> [vpn\_server](#module\_vpn\_server) | terraform-aws-modules/ec2-instance/aws | 5.2.1 |
 
 ## Resources
 
@@ -60,6 +60,7 @@ Refer [this](https://pritunl.com/) for more information.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_environment"></a> [environment](#input\_environment) | Specify the environment indentifier for the VPC | `string` | `""` | no |
+| <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | ARN of the KMS key to encrypt VPN server EBS volume | `string` | `""` | no |
 | <a name="input_name"></a> [name](#input\_name) | Specify the name of the VPC | `string` | `""` | no |
 | <a name="input_public_subnet"></a> [public\_subnet](#input\_public\_subnet) | The VPC Subnet ID to launch in | `string` | `""` | no |
 | <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | The CIDR block of the Default VPC | `string` | `"10.0.0.0/16"` | no |
