@@ -204,6 +204,7 @@ resource "aws_ssm_document" "ssm_document" {
          "action": "aws:runShellScript",
          "name": "example",
          "inputs": {
+            "timeoutSeconds": 200,
             "runCommand": [
                "SETUPKEY=$(sudo pritunl setup-key)",
                "sleep 60",
@@ -215,6 +216,7 @@ resource "aws_ssm_document" "ssm_document" {
          }
       }
    ]
+   
 }
 DOC
 }
