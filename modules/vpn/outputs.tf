@@ -15,5 +15,5 @@ output "vpn_security_group" {
 
 output "vpn_port_description" {
   description = "Allow traffic from UDP port 10150 in your secutiy group server"
-  value = "Allow traffic from UDP port 10150 in your security group server"
+  value       = "Allow traffic from UDP port 10150 in your security group server"
 }

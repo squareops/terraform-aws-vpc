@@ -74,5 +74,6 @@ Refer [this](https://pritunl.com/) for more information.
 |------|-------------|
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC |
 | <a name="output_vpn_host_public_ip"></a> [vpn\_host\_public\_ip](#output\_vpn\_host\_public\_ip) | IP Address of VPN Server |
+| <a name="output_vpn_port_description"></a> [vpn\_port\_description](#output\_vpn\_port\_description) | Allow traffic from UDP port 10150 in your secutiy group server |
 | <a name="output_vpn_security_group"></a> [vpn\_security\_group](#output\_vpn\_security\_group) | Security Group ID of VPN Server |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

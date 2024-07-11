@@ -56,5 +56,5 @@ output "vpc_secondary_cidr_blocks" {
 
 output "vpn_port_description" {
   description = "Description of VPN server port"
-  value = var.vpn_server_enabled ? module.vpn_server[0].vpn_port_description : ""
+  value       = var.vpn_server_enabled ? module.vpn_server[0].vpn_port_description : ""
 }

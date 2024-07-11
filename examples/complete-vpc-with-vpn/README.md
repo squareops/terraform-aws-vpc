@@ -35,7 +35,7 @@ No requirements.
 |------|--------|---------|
 | <a name="module_key_pair_vpn"></a> [key\_pair\_vpn](#module\_key\_pair\_vpn) | squareops/keypair/aws | 1.0.2 |
 | <a name="module_kms"></a> [kms](#module\_kms) | terraform-aws-modules/kms/aws | 3.1.0 |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | ../../ | n/a |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | squareops/vpc/aws | 3.3.5 |
 
 ## Resources
 
