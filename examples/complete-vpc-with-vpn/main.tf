@@ -91,8 +91,8 @@ module "vpc" {
   one_nat_gateway_per_az                          = true
   database_subnet_enabled                         = true
   vpn_server_instance_type                        = "t3a.small"
-  vpc_s3_endpoint_enabled                         = false
-  vpc_ecr_endpoint_enabled                        = false
+  vpc_s3_endpoint_enabled                         = true
+  vpc_ecr_endpoint_enabled                        = true
   flow_log_max_aggregation_interval               = 60 # In seconds
   flow_log_cloudwatch_log_group_skip_destroy      = true
   flow_log_cloudwatch_log_group_retention_in_days = 90

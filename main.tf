@@ -143,7 +143,7 @@ module "vpc" {
   })
 
   private_subnet_tags_per_az = { for az in var.availability_zones : az => {
-    "Karpenter" = "${az}"
+    "Karpenter" = "${var.name}-${az}"
   } }
 
   private_route_table_tags = tomap({
