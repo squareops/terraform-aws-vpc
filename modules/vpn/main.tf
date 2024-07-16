@@ -98,6 +98,7 @@ module "vpn_server" {
   vpc_security_group_ids      = [module.security_group_vpn.security_group_id]
   user_data                   = join("", data.template_file.pritunl[*].rendered)
   iam_instance_profile        = join("", aws_iam_instance_profile.vpn_SSM[*].name)
+  ignore_ami_changes          = true
 
 
   root_block_device = [
@@ -216,7 +217,7 @@ resource "aws_ssm_document" "ssm_document" {
          }
       }
    ]
-   
+
 }
 DOC
 }
