@@ -7,9 +7,10 @@ locals {
     Expires    = "Never"
     Department = "Engineering"
   }
-  vpc_cidr     = "10.10.0.0/16"
-  ipv6_enabled = true
-  ipv6_only    = true
+  vpc_cidr           = "10.10.0.0/16"
+  availability_zones = ["us-east-1a", "us-east-1b"]
+  ipv6_enabled       = true
+  ipv6_only          = true
 }
 
 module "vpc" {
@@ -19,7 +20,7 @@ module "vpc" {
   ipv6_only                                       = local.ipv6_only
   environment                                     = local.environment
   ipv6_enabled                                    = local.ipv6_enabled
-  availability_zones                              = ["us-east-1a", "us-east-1b"]
+  availability_zones                              = local.availability_zones
   public_subnet_enabled                           = true
   private_subnet_enabled                          = true
   intra_subnet_enabled                            = true

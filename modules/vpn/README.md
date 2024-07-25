@@ -33,8 +33,8 @@ Refer [this](https://pritunl.com/) for more information.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_security_group_vpn"></a> [security\_group\_vpn](#module\_security\_group\_vpn) | terraform-aws-modules/security-group/aws | 4.13.0 |
-| <a name="module_vpn_server"></a> [vpn\_server](#module\_vpn\_server) | terraform-aws-modules/ec2-instance/aws | 4.1.4 |
+| <a name="module_security_group_vpn"></a> [security\_group\_vpn](#module\_security\_group\_vpn) | terraform-aws-modules/security-group/aws | 5.1.2 |
+| <a name="module_vpn_server"></a> [vpn\_server](#module\_vpn\_server) | terraform-aws-modules/ec2-instance/aws | 5.2.1 |
 
 ## Resources
 
@@ -49,7 +49,7 @@ Refer [this](https://pritunl.com/) for more information.
 | [aws_ssm_document.ssm_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_document) | resource |
 | [null_resource.delete_secret](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [time_sleep.wait_3_min](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
-| [aws_ami.ubuntu_20_ami](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_ami.ubuntu_22_ami](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_iam_policy.SSMManagedInstanceCore](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy) | data source |
 | [aws_iam_policy.SecretsManagerReadWrite](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
@@ -60,6 +60,7 @@ Refer [this](https://pritunl.com/) for more information.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_environment"></a> [environment](#input\_environment) | Specify the environment indentifier for the VPC | `string` | `""` | no |
+| <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | ARN of the KMS key to encrypt VPN server EBS volume | `string` | `""` | no |
 | <a name="input_name"></a> [name](#input\_name) | Specify the name of the VPC | `string` | `""` | no |
 | <a name="input_public_subnet"></a> [public\_subnet](#input\_public\_subnet) | The VPC Subnet ID to launch in | `string` | `""` | no |
 | <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | The CIDR block of the Default VPC | `string` | `"10.0.0.0/16"` | no |
@@ -73,5 +74,6 @@ Refer [this](https://pritunl.com/) for more information.
 |------|-------------|
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC |
 | <a name="output_vpn_host_public_ip"></a> [vpn\_host\_public\_ip](#output\_vpn\_host\_public\_ip) | IP Address of VPN Server |
+| <a name="output_vpn_port_description"></a> [vpn\_port\_description](#output\_vpn\_port\_description) | Allow traffic from UDP port 10150 in your secutiy group server |
 | <a name="output_vpn_security_group"></a> [vpn\_security\_group](#output\_vpn\_security\_group) | Security Group ID of VPN Server |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
