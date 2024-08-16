@@ -6,6 +6,8 @@ locals {
     Owner      = "SquareOps"
     Expires    = "Never"
     Department = "Engineering"
+    Product    = "Atmosly"
+    Environment = local.environment
   }
   vpc_cidr              = "10.10.0.0/16"
   availability_zones    = ["us-east-1a", "us-east-1b"]
