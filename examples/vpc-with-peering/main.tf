@@ -8,6 +8,8 @@ locals {
   additional_tags = {
     Owner   = "tenent"
     Tenancy = "dedicated"
+    Product    = "Atmosly"
+    Environment = local.environment
   }
 }
 
