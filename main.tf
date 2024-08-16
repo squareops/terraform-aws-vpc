@@ -274,6 +274,74 @@ resource "aws_security_group" "vpc_endpoints" {
     to_port     = 443
     cidr_blocks = [var.vpc_cidr]
   }
+  
+  ingress {
+      description                   = "Cluster API to node kubelets"
+      protocol                      = "tcp"
+      from_port                     = 10250
+      to_port                       = 10250
+      cidr_blocks = [var.vpc_cidr]
+    }
+    ingress {
+      description = "Node to node CoreDNS"
+      protocol    = "tcp"
+      from_port   = 53
+      to_port     = 53
+      self        = true
+    }
+    ingress {
+      description = "Node to node CoreDNS UDP"
+      protocol    = "udp"
+      from_port   = 53
+      to_port     = 53
+      self        = true
+    }
+    ingress {
+      description = "Node to node ingress on ephemeral ports"
+      protocol    = "tcp"
+      from_port   = 1025
+      to_port     = 65535
+      cidr_blocks = [var.vpc_cidr]
+      self        = true
+    }
+    ingress {
+      description                   = "Cluster API to node 4443/tcp webhook"
+      protocol                      = "tcp"
+      from_port                     = 4443
+      to_port                       = 4443
+      cidr_blocks = [var.vpc_cidr]
+    }
+    ingress {
+      description                   = "Cluster API to node 6443/tcp webhook"
+      protocol                      = "tcp"
+      from_port                     = 6443
+      to_port                       = 6443
+      cidr_blocks = [var.vpc_cidr]
+    }
+
+
+    ingress {
+      description                   = "Cluster API to node 8443/tcp webhook"
+      protocol                      = "tcp"
+      from_port                     = 8443
+      to_port                       = 8443
+      cidr_blocks = [var.vpc_cidr]
+    }
+    ingress {
+      description                   = "Cluster API to node 9443/tcp webhook"
+      protocol                      = "tcp"
+      from_port                     = 9443
+      to_port                       = 9443
+      cidr_blocks = [var.vpc_cidr]
+    }
+    egress {
+      description      = "Allow all egress"
+      protocol         = "-1"
+      from_port        = 0
+      to_port          = 0
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+    }
 }
 
 # private links for ECR.dkr
@@ -311,13 +379,14 @@ resource "aws_vpc_endpoint" "private-ecr-api" {
   vpc_id              = module.vpc.vpc_id
   subnet_ids          = module.vpc.private_subnets
   service_name        = "com.amazonaws.${var.region}.ecr.api"
+  security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   policy              = <<POLICY
 {
     "Statement": [
         {
-            "Action": "ecr.api",
+            "Action": "*",
             "Effect": "Allow",
             "Resource": "*",
             "Principal": "*"
