@@ -33,6 +33,7 @@ data "aws_route_tables" "requester" {
   provider = aws.peer
 }
 
+# Create a VPC peering connection request
 resource "aws_vpc_peering_connection" "this" {
   count       = var.peering_enabled ? 1 : 0
   vpc_id      = var.requester_vpc_id
@@ -45,6 +46,7 @@ resource "aws_vpc_peering_connection" "this" {
   }
 }
 
+# Allow destination VPC to acess the peering request.
 resource "aws_vpc_peering_connection_accepter" "this" {
   count                     = var.peering_enabled ? 1 : 0
   depends_on                = [aws_vpc_peering_connection.this]
@@ -56,6 +58,7 @@ resource "aws_vpc_peering_connection_accepter" "this" {
   }
 }
 
+# Define AWS VPC peering connection options
 resource "aws_vpc_peering_connection_options" "this" {
   count                     = var.peering_enabled ? 1 : 0
   depends_on                = [aws_vpc_peering_connection_accepter.this]

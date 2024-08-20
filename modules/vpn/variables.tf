@@ -40,3 +40,9 @@ variable "vpn_key_pair" {
   default     = ""
   type        = string
 }
+
+variable "kms_key_arn" {
+  description = "ARN of the KMS key to encrypt VPN server EBS volume"
+  type        = string
+  default     = ""
+}
